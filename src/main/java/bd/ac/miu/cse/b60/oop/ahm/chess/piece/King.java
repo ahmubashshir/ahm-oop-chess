@@ -4,129 +4,80 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 
-
 /**
- * The King class represents a king chess piece. It extends the Piece class and
- * includes
- * additional functionality specific to the king, such as tracking whether the
- * king has moved
- * and checking the validity of its moves.
- *
+ * Represents the {@code King} piece in chess.
+ * Extends the {@code Piece} class and tracks whether the king has moved.
+ * Handles validation for standard king moves and castling.
  */
-public class King extends Piece
-{
-
-	private boolean hasMoved; // Keep track of whether the king has moved
+public class King extends Piece {
+	private boolean hasMoved; // Tracks whether the king has moved
 
 	/**
-	 * Constructs a new King object with the specified color.
+	 * Constructs a new {@code King} with the specified {@code Color}.
 	 *
-	 * @param color  Sets {@code Color} of the Piece.
+	 * @param color The {@code Color} of the king ({@code Color.WHITE} or {@code Color.BLACK})
 	 */
-	public King(Color color)
-	{
+	public King(Color color) {
 		super("King", color);
 		this.hasMoved = false;
 	}
 
 	/**
-	 * Checks if a move from the source square to the destination square is a valid
-	 * move for the king.
-	 * The validity is determined by the standard one-square move or the castling
-	 * maneuver.
+	 * Determines whether a move from the source square to the destination square
+	 * is valid for a {@code King}.
+	 * Supports both regular one-square moves in any direction and castling.
 	 *
-	 * @param sourceRow the row index of the source square.
-	 * @param sourceCol the column index of the source square.
-	 * @param destRow   the row index of the destination square.
-	 * @param destCol   the column index of the destination square.
-	 * @param board     the chessboard represented by a 2D array of {@code Square}s.
-	 * @return {@code true} if the move is valid, {@code false} otherwise.
+	 * @param sourceRow The row index of the source square
+	 * @param sourceCol The column index of the source square
+	 * @param destRow   The row index of the destination square
+	 * @param destCol   The column index of the destination square
+	 * @param board     The chessboard as a 2D array of {@code Square}s
+	 * @return {@code true} if the move is valid, {@code false} otherwise
 	 */
-	public boolean isValidMove(int sourceRow, int sourceCol, int destRow, int destCol, Square[][] board)
-	{
-		// Check if move is one square in any direction (Move distance <= 1)
+	public boolean isValidMove(int sourceRow, int sourceCol, int destRow, int destCol, Square[][] board) {
+		// Check one-square move
 		boolean isOneSquareMove = (Math.abs(destRow - sourceRow) <= 1) && (Math.abs(destCol - sourceCol) <= 1);
+		// Check bounds
+		boolean isWithinBounds = (destRow >= 0) && (destRow < board.length) && (destCol >= 0) && (destCol < board[0].length);
 
-		// Check if destination is within the bounds of the board
-		boolean isWithinBounds = (destRow >= 0) && (destRow < board.length) && (destCol >= 0)
-		                         && (destCol < board[0].length);
+		if (isWithinBounds) {
+			if (isOneSquareMove) {
+				this.hasMoved = true;
+				return true;
+			} else if (!hasMoved && (Math.abs(destCol - sourceCol) == 2) && (destRow == sourceRow)) {
+				int rookCol = (destCol > sourceCol) ? board[0].length - 1 : 0;
+				Square rookSquare = board[destRow][rookCol];
 
-		// Only allow pass if move is valid
-		if (isWithinBounds)
-			{
-				// Regular one-square move
-				if (isOneSquareMove)
-					{
-						this.hasMoved = true;
-						return true;
-					}
-				// Automatically check for castling maneuver, check if King has moved and if
-				// move is in correct column and row
-				else if ((!hasMoved) && (Math.abs(destCol - sourceCol) == 2) && (destRow == sourceRow))
-					{
-						int rookCol;
-						// Check which side of the board the rook is on
-						if (destCol > sourceCol)
-							{
-								// Rook is on the right side
-								rookCol = board[0].length - 1;
-							}
-						else
-							{
-								// Rook is on the left side
-								rookCol = 0;
-							}
-						Square rookSquare = board[destRow][rookCol];
+				if ((rookSquare.getPiece() instanceof Rook) && (!((Rook) rookSquare.getPiece()).hasMoved())) {
+					int colIncrement = (destCol > sourceCol) ? 1 : -1;
 
-						// Pass if the rookSquare has a rook and the rook hasn't moved
-						if ((rookSquare.getPiece() instanceof Rook) && (!((Rook) rookSquare.getPiece()).hasMoved()))
-							{
-								// Check which direction
-								int colIncrement;
-								if (destCol > sourceCol)
-									{
-										// Moving right
-										colIncrement = 1;
-									}
-								else
-									{
-										// Moving left
-										colIncrement = -1;
-									}
+					for (int col = sourceCol + colIncrement; col != destCol; col += colIncrement)
+						if (board[destRow][col].getPiece() != null)
+							return false;
 
-								// Check if the squares between the king and the rook are empty
-								// Return false if there is a piece in the path for castling
-								for (int col = sourceCol + colIncrement; col != destCol; col += colIncrement)
-									{
-										if (board[destRow][col].getPiece() != null)
-											{
-												return false;
-											}
-									}
-
-								this.hasMoved = true;
-								// The castling maneuver is valid
-								return true;
-							}
-					}
+					this.hasMoved = true;
+					return true;
+				}
 			}
-
-		// Not a valid move for the king
+		}
 		return false;
 	}
 
 	/**
-	 * Checks if the king has moved for castling.
+	 * Returns whether the {@code King} has moved.
 	 *
-	 * @return True if the king has moved, false otherwise.
+	 * @return {@code true} if the king has moved, {@code false} otherwise
 	 */
-	public boolean hasMoved()
-	{
+	public boolean hasMoved() {
 		return hasMoved;
 	}
 
-	public void setMoved(boolean hasMoved)
-	{
+	/**
+	 * Sets the moved status of the {@code King}.
+	 *
+	 * @param hasMoved {@code true} if the king has moved, {@code false} otherwise
+	 */
+	public void setMoved(boolean hasMoved) {
 		this.hasMoved = hasMoved;
 	}
 }
