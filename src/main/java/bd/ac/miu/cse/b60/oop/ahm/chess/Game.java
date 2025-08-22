@@ -243,7 +243,7 @@ public class Game {
 			return MoveStatus.PlayerError;
 
 		// Check if the move is valid for the specific piece
-		if (pieceToMove.isValidMove(src.row, src.col, dst.row, dst.col, board)) {
+		if (pieceToMove.isValidMove(src, dst, board)) {
 			// Check if the destination square is empty or has an opponent's piece
 			if (destSquare.getPiece() == null || destSquare.getPiece().getIsWhite() != pieceToMove.getIsWhite()) {
 				// Capture the opponent’s piece if it exists
@@ -268,7 +268,7 @@ public class Game {
 				}
 
 				// Check for a clear path for non-castling moves
-				if (isPathClear(new Coord(src.col, src.row), new Coord(dst.col, dst.row))) {
+				if (isPathClear(src, dst)) {
 					// Move the piece to the destination square
 					destSquare.setPiece(pieceToMove);
 					sourceSquare.setPiece(null);

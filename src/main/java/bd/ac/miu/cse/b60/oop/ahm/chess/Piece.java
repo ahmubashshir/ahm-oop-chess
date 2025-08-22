@@ -71,4 +71,17 @@ public abstract class Piece {
 	 * @return {@code true} if the move is valid, {@code false} otherwise
 	 */
 	public abstract boolean isValidMove(int sourceRow, int sourceCol, int destRow, int destCol, Square[][] board);
+
+	/**
+	 * Checks if a move from the source square to the destination square is valid for this piece.
+	 *
+	 * @param src       Source square coordinates.
+	 * @param dst       Destination square coordinates.
+	 * @param board     the chessboard as a 2D array of {@code Square} objects
+	 * @return {@code true} if the move is valid, {@code false} otherwise
+	 */
+	public boolean isValidMove(Coord src, Coord dst, Square[][] board) {
+		return isValidMove(src.row, src.col, dst.row, dst.col, board);
+	}
+
 }
