@@ -118,8 +118,18 @@ public class Game {
 	 * @param timeLimit The time limit for each player.
 	 */
 	public Game(LocalTime timeLimit) {
+		this(timeLimit, new Display());
+	}
+
+	/**
+	 * Initializes a new game with a time limit.
+	 *
+	 * @param timeLimit The time limit for each player.
+	 * @param display	Display Manager Instance.
+	 */
+	public Game(LocalTime timeLimit, Display display) {
 		board = new Square[DEFAULT_BOARD_WIDTH][DEFAULT_BOARD_HEIGHT];
-		display = new Display();
+		this.display = display;
 		// Initialize each Square object in the board array
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 			for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {

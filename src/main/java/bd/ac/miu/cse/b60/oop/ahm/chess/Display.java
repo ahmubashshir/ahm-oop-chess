@@ -32,7 +32,7 @@ public class Display {
 		System.out.println(); // Create new line
 
 		for (int row = 0; row < board.length; row++) {
-			System.out.print(String.format("%d |", row)); // Leftmost board outline
+			System.out.print(String.format("%d |", row + 1)); // Leftmost board outline
 			for (int col = 0; col < board[row].length; col++) {
 				if (board[row][col] != null && board[row][col].getPiece() != null) {
 					// Piece exists, print piece name
