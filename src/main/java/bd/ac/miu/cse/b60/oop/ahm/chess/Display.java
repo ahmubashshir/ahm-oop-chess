@@ -12,11 +12,7 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
  */
-public abstract class Display {
-
-	/** Default Constructor */
-	public Display() {}
-
+public interface Display {
 	/**
 	 * Prints the current state of the chessboard to the display device.
 	 *
@@ -24,7 +20,7 @@ public abstract class Display {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece
 	 */
-	public abstract void printBoard(Square[][] board);
+	public void printBoard(Square[][] board);
 
 	/**
 	 * Prints the captured pieces for each player.
@@ -33,7 +29,7 @@ public abstract class Display {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece#getCaptured()
 	 */
-	public abstract void printCapturedPieces(Player[] players);
+	public void printCapturedPieces(Player[] players);
 
 	/**
 	 * Asks Player to enter co-ordinate for an action
@@ -46,7 +42,7 @@ public abstract class Display {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game#move
 	 */
-	public abstract Coord getCoord(String query);
+	public Coord getCoord(String query);
 
 	/**
 	 * Displays the main menu and reads the user's choice.
@@ -58,5 +54,5 @@ public abstract class Display {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult
 	 * @see bd.ac.miu.cse.b60.oop.ahm.Chess
 	 */
-	public abstract MenuResult mainMenu();
+	public MenuResult mainMenu();
 }

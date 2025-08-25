@@ -12,7 +12,7 @@ import java.util.Scanner;
  * The {@code CLIDisplay} class is responsible for printing the current state of
  * the chessboard and the captured pieces of each player to the console.
  */
-public class CLIDisplay extends Display {
+public class CLIDisplay implements Display {
 
 	private Scanner input;
 
