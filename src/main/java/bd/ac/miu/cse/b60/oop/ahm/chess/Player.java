@@ -3,13 +3,12 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 import java.time.LocalTime;
 import java.util.Timer;
 import java.util.TimerTask;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 
 /**
  * Represents a chess player with a unique ID, timer, and methods to manage time and captured pieces.
  */
-public class Player
-{
+public class Player {
+
 	/** Unique identifier for the player. */
 	private int playerID;
 
@@ -45,8 +44,7 @@ public class Player
 	 *
 	 * @param id the unique identifier for the player
 	 */
-	public Player(int id)
-	{
+	public Player(int id) {
 		playerID = id;
 		capturedPieces = new Piece[16];
 		capturedCount = 0;
@@ -58,8 +56,7 @@ public class Player
 	 * @param id        the unique identifier for the player
 	 * @param timeLimit the time limit for the player's activities
 	 */
-	public Player(int id, LocalTime timeLimit)
-	{
+	public Player(int id, LocalTime timeLimit) {
 		playerID = id;
 		this.timeLimit = timeLimit;
 		capturedPieces = new Piece[16];
@@ -71,8 +68,7 @@ public class Player
 	 *
 	 * @return the player's ID
 	 */
-	public int getPlayerID()
-	{
+	public int getPlayerID() {
 		return playerID;
 	}
 
@@ -81,12 +77,10 @@ public class Player
 	 *
 	 * @param capturedPiece the {@code Piece} captured by the player
 	 */
-	public void capturePiece(Piece capturedPiece)
-	{
-		if (capturedCount < capturedPieces.length)
-			{
-				capturedPieces[capturedCount++] = capturedPiece;
-			}
+	public void capturePiece(Piece capturedPiece) {
+		if (capturedCount < capturedPieces.length) {
+			capturedPieces[capturedCount++] = capturedPiece;
+		}
 	}
 
 	/**
@@ -94,8 +88,7 @@ public class Player
 	 *
 	 * @return an array of captured {@code Piece} objects
 	 */
-	public Piece[] getCapturedPieces()
-	{
+	public Piece[] getCapturedPieces() {
 		return capturedPieces;
 	}
 
@@ -104,31 +97,32 @@ public class Player
 	 *
 	 * @return the count of captured pieces
 	 */
-	public int getCapturedCount()
-	{
+	public int getCapturedCount() {
 		return capturedCount;
 	}
 
 	/**
 	 * Starts the player's timer, incrementing {@code timeConsumed} by one second at regular intervals.
 	 */
-	public void startTimer()
-	{
+	public void startTimer() {
 		timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask()
-		{
-			public void run()
-			{
-				if (!isTimerPaused)
-					{
-						timeConsumed = timeConsumed.plusSeconds(1);
-						if (timeLimit != null && timeConsumed.compareTo(timeLimit) >= 0)
-							{
-								isTimeFinished = true;
-							}
+		timer.scheduleAtFixedRate(
+		new TimerTask() {
+			public void run() {
+				if (!isTimerPaused) {
+					timeConsumed = timeConsumed.plusSeconds(1);
+					if (
+					    timeLimit != null &&
+					    timeConsumed.compareTo(timeLimit) >= 0
+					) {
+						isTimeFinished = true;
 					}
+				}
 			}
-		}, 0, 1000); // Start immediately, repeat every 1000ms
+		},
+		0,
+		1000
+		); // Start immediately, repeat every 1000ms
 	}
 
 	/**
@@ -136,32 +130,28 @@ public class Player
 	 *
 	 * @return {@code true} if the time limit is reached, {@code false} otherwise
 	 */
-	public boolean getIsTimeFinished()
-	{
+	public boolean getIsTimeFinished() {
 		return isTimeFinished;
 	}
 
 	/**
 	 * Pauses the player's timer.
 	 */
-	public void pauseTimer()
-	{
+	public void pauseTimer() {
 		isTimerPaused = true;
 	}
 
 	/**
 	 * Resumes the player's timer from where it was paused.
 	 */
-	public void continueTimer()
-	{
+	public void continueTimer() {
 		isTimerPaused = false;
 	}
 
 	/**
 	 * Stops the player's timer.
 	 */
-	public void stopTimer()
-	{
+	public void stopTimer() {
 		timer.cancel();
 	}
 
@@ -170,8 +160,7 @@ public class Player
 	 *
 	 * @return the {@code LocalTime} representing time consumed
 	 */
-	public LocalTime getTimeConsumed()
-	{
+	public LocalTime getTimeConsumed() {
 		return timeConsumed;
 	}
 
@@ -180,8 +169,7 @@ public class Player
 	 *
 	 * @return the time consumed in minutes
 	 */
-	public long getTimePassedInMinutes()
-	{
+	public long getTimePassedInMinutes() {
 		return timeConsumed.toSecondOfDay() / 60;
 	}
 
@@ -190,8 +178,7 @@ public class Player
 	 *
 	 * @param newMax the new maximum number of turns
 	 */
-	public void setMaxNumOfTurns(int newMax)
-	{
+	public void setMaxNumOfTurns(int newMax) {
 		this.maxNumOfTurns = newMax;
 	}
 
@@ -200,8 +187,7 @@ public class Player
 	 *
 	 * @return the maximum number of turns
 	 */
-	public int getMaxNumOfTurns()
-	{
+	public int getMaxNumOfTurns() {
 		return this.maxNumOfTurns;
 	}
 
@@ -210,8 +196,7 @@ public class Player
 	 *
 	 * @return the number of turns completed
 	 */
-	public int getNumOfTurns()
-	{
+	public int getNumOfTurns() {
 		return this.numOfTurns;
 	}
 
@@ -220,8 +205,7 @@ public class Player
 	 *
 	 * @param newNum the new number of turns
 	 */
-	public void setNumOfTurns(int newNum)
-	{
+	public void setNumOfTurns(int newNum) {
 		this.numOfTurns = newNum;
 	}
 }

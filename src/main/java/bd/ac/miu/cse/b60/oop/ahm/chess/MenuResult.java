@@ -17,10 +17,11 @@ public enum MenuResult {
 	 * Constructs a {@code MenuResult} from menu id.
 	 *
 	 * @param id menu index.
+	 * @return {@code MenuResult}
 	 * @throws IllegalArgumentException {@code id} is outside the {@code MenuResult}.
 	 */
 	public static MenuResult fromInt(int id) {
-		switch(id) {
+		switch (id) {
 		case 1:
 			return START;
 		case 2:

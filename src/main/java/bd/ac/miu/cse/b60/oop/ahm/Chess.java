@@ -1,13 +1,13 @@
 package bd.ac.miu.cse.b60.oop.ahm;
 
+import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
+import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
+import bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
-import bd.ac.miu.cse.b60.oop.ahm.chess.CLIDisplay;
-import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
-import bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult;
+
 /**
  * Entry point class for the {@code Chess} game.
  * Handles the main menu, user input, and game loop.
@@ -22,7 +22,6 @@ public final class Chess {
 	 */
 	public Chess() {}
 
-
 	/**
 	 * Entry point of the {@code Chess} game.
 	 *
@@ -34,8 +33,9 @@ public final class Chess {
 
 		System.out.print("\033[H\033[2J");
 		while (true) {
-			switch(disp.mainMenu()) {
-			case START: { // Start game
+			switch (disp.mainMenu()) {
+			case START: {
+				// Start game
 				game = new Game(timeLimit, disp);
 				game.initializePiecePositions();
 				game.setMaxNumOfTurns(10);
@@ -55,42 +55,78 @@ public final class Chess {
 				// Game loop
 				while (true) {
 					currentPlayer = game.getCurrentPlayer();
-					String playerColor = currentPlayer.getPlayerID() == 1 ? "Black" : "White";
+					String playerColor = currentPlayer.getPlayerID() ==
+					                     1
+					                     ? "Black"
+					                     : "White";
 
-					System.out.println("\n=====================================================");
+					System.out.println(
+					    "\n====================================================="
+					);
 					System.out.println(playerColor + " Player's turn.");
 
 					if (game.isDraw()) {
-						System.out.println("=====================================================");
-						System.out.println("Both players have run out of turns, game ends in a draw");
+						System.out.println(
+						    "====================================================="
+						);
+						System.out.println(
+						    "Both players have run out of turns, game ends in a draw"
+						);
 						game.end();
 						break;
 					} else if (game.isTimeFinished()) {
-						System.out.println("=====================================================");
-						System.out.println(playerColor + " loses as they ran out of time.");
+						System.out.println(
+						    "====================================================="
+						);
+						System.out.println(
+						    playerColor +
+						    " loses as they ran out of time."
+						);
 						game.end();
 						break;
 					} else if (!game.isKingAlive()) {
-						System.out.println("=====================================================");
-						System.out.println(playerColor + " King is dead, they lose the game");
+						System.out.println(
+						    "====================================================="
+						);
+						System.out.println(
+						    playerColor +
+						    " King is dead, they lose the game"
+						);
 						game.end();
 						break;
 					} else if (game.isCheck()) {
-						System.out.println("=============================");
-						System.out.println("| WARNING! YOU ARE CHECKED! |");
-						System.out.println("=============================");
+						System.out.println(
+						    "============================="
+						);
+						System.out.println(
+						    "| WARNING! YOU ARE CHECKED! |"
+						);
+						System.out.println(
+						    "============================="
+						);
 					}
 
-					System.out.println("-----------------------------------------------------");
+					System.out.println(
+					    "-----------------------------------------------------"
+					);
 					game.printCapturedPieces();
-					System.out.println("-----------------------------------------------------");
+					System.out.println(
+					    "-----------------------------------------------------"
+					);
 
 					game.printBoard();
 
-					System.out.println("-----------------------------------------------------");
-					System.out.println(playerColor + " Player's time consumed so far: "
-					                   + formatTime(currentPlayer.getTimeConsumed()));
-					System.out.println("-----------------------------------------------------");
+					System.out.println(
+					    "-----------------------------------------------------"
+					);
+					System.out.println(
+					    playerColor +
+					    " Player's time consumed so far: " +
+					    formatTime(currentPlayer.getTimeConsumed())
+					);
+					System.out.println(
+					    "-----------------------------------------------------"
+					);
 
 					currentPlayer.continueTimer(); // Continue timer
 
@@ -98,44 +134,64 @@ public final class Chess {
 					try {
 						src = disp.getCoord("of piece to move");
 						if (src == null) {
-							System.out.println("Game ended forcefully.");
+							System.out.println(
+							    "Game ended forcefully."
+							);
 							game.end();
 							break;
 						}
 
-						dst = disp.getCoord("of the square to move the piece to");
+						dst = disp.getCoord(
+						          "of the square to move the piece to"
+						      );
 						if (dst == null) {
-							System.out.println("Game ended forcefully.");
+							System.out.println(
+							    "Game ended forcefully."
+							);
 							game.end();
 							break;
 						}
 
 						System.out.print("\033[H\033[2J");
-					} catch (IllegalArgumentException|StringIndexOutOfBoundsException e) {
+					} catch (
+						    IllegalArgumentException
+						    | StringIndexOutOfBoundsException e
+						) {
 						System.out.print("\033[H\033[2J");
-						System.out.println("ERROR: Invalid parameters!");
+						System.out.println(
+						    "ERROR: Invalid parameters!"
+						);
 						System.out.println(e);
 						continue;
 					}
 
 					if (game.isTimeFinished()) {
-						System.out.println(playerColor + " loses as they ran out of time.");
-						System.out.println("-----------------------------------------------------");
+						System.out.println(
+						    playerColor +
+						    " loses as they ran out of time."
+						);
+						System.out.println(
+						    "-----------------------------------------------------"
+						);
 						game.end();
 						break;
 					}
 
 					MoveStatus moveStatus = game.move(src, dst);
 					if (moveStatus == MoveStatus.Ok) {
-						System.out.println("Moved successfully, turn ending.");
+						System.out.println(
+						    "Moved successfully, turn ending."
+						);
 						currentPlayer.pauseTimer();
 						game.setNumOfTurns(game.getCurrentPlayer(), 1);
 						game.switchPlayer();
 					} else {
-						System.out.println(String.format("ERROR: %s", moveStatus.info));
+						System.out.println(
+						    String.format("ERROR: %s", moveStatus.info)
+						);
 					}
 				}
-			};
+			}
 			break;
 			case EXIT: {
 				System.out.println("Thank you for playing");

@@ -1,15 +1,14 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
-
 /**
  * Represents a single square on the chess board, which may contain a piece.
  */
 public class Square {
+
 	private Piece piece;
 
 	/** Default Constructor */
-	public Square() { }
+	public Square() {}
 
 	/**
 	 * Places a piece on this square.

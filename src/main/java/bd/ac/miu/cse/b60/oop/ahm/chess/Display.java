@@ -1,9 +1,5 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
-
 /**
  * The {@code Display} class is responsible for displaying the current state of
  * the chessboard and the captured pieces of each player to the display device.
@@ -11,7 +7,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 public abstract class Display {
 
 	/** Default Constructor */
-	public Display() { }
+	public Display() {}
 
 	/**
 	 * Prints the current state of the chessboard to the display device.
@@ -45,5 +41,4 @@ public abstract class Display {
 	 * @return the {@code MenuResult} corresponding to the user's menu selection
 	 */
 	public abstract MenuResult mainMenu();
-
 }

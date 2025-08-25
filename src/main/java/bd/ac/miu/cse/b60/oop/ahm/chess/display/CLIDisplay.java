@@ -1,8 +1,11 @@
-package bd.ac.miu.cse.b60.oop.ahm.chess;
+package bd.ac.miu.cse.b60.oop.ahm.chess.display;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Display;
+import bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 import java.util.Scanner;
 
 /**
@@ -26,7 +29,9 @@ public class CLIDisplay extends Display {
 	public void printBoard(Square[][] board) {
 		int cellWidth = 10; // Cell width modifier
 
-		System.out.println("       a          b          c          d          e          f          h          h");
+		System.out.println(
+		    "       a          b          c          d          e          f          h          h"
+		);
 
 		// Print top of the board outline
 		System.out.print("  ");
@@ -39,10 +44,15 @@ public class CLIDisplay extends Display {
 		for (int row = 0; row < board.length; row++) {
 			System.out.print(String.format("%d |", row + 1)); // Leftmost board outline
 			for (int col = 0; col < board[row].length; col++) {
-				if (board[row][col] != null && board[row][col].getPiece() != null) {
+				if (
+				    board[row][col] != null &&
+				    board[row][col].getPiece() != null
+				) {
 					// Piece exists, print piece name
 					String pieceName = board[row][col].getPiece().getName();
-					System.out.print(String.format("%-" + cellWidth + "s", pieceName));
+					System.out.print(
+					    String.format("%-" + cellWidth + "s", pieceName)
+					);
 				} else {
 					// No piece, print empty space
 					System.out.print(String.format("%-" + cellWidth + "s", ""));
@@ -60,14 +70,20 @@ public class CLIDisplay extends Display {
 			// Print horizontal separator
 			if (row < board.length) {
 				System.out.print("  ");
-				for (int i = 0; i < (board[row].length + 1) * cellWidth - 1; i++) {
+				for (
+				    int i = 0;
+				    i < (board[row].length + 1) * cellWidth - 1;
+				    i++
+				) {
 					System.out.print("-");
 				}
 				System.out.println();
 			}
 		}
 
-		System.out.println("       a          b          c          d          e          f          h          h");
+		System.out.println(
+		    "       a          b          c          d          e          f          h          h"
+		);
 	}
 
 	/**
@@ -77,7 +93,9 @@ public class CLIDisplay extends Display {
 	 */
 	public void printCapturedPieces(Player[] players) {
 		for (Player player : players) {
-			System.out.println("Player " + player.getPlayerID() + "'s Captured Pieces:");
+			System.out.println(
+			    "Player " + player.getPlayerID() + "'s Captured Pieces:"
+			);
 			Piece[] capturedPieces = player.getCapturedPieces();
 			int capturedCount = player.getCapturedCount();
 
@@ -96,9 +114,14 @@ public class CLIDisplay extends Display {
 	 * @return a {@code Coord} object containing the column and row, or {@code null} if the user enters -1
 	 */
 	public Coord getCoord(String query) {
-		System.out.print(String.format("Enter the position %s (q to abort) (col row): ", query));
+		System.out.print(
+		    String.format(
+		        "Enter the position %s (q to abort) (col row): ",
+		        query
+		    )
+		);
 		String in = input.next().trim();
-		if(in.equals("q")) return null;
+		if (in.equals("q")) return null;
 		System.out.println(String.format(":%s:", in));
 
 		return new Coord(in.charAt(0 /* col */), in.charAt(1 /* row */));
@@ -116,8 +139,7 @@ public class CLIDisplay extends Display {
 		System.out.println("2. Exit");
 		System.out.print("Your choice: ");
 		MenuResult ret = MenuResult.fromInt(input.nextInt());
-		if (ret == MenuResult.EXIT)
-			input.close();
+		if (ret == MenuResult.EXIT) input.close();
 		System.out.print("\033[H\033[2J");
 		return ret;
 	}
