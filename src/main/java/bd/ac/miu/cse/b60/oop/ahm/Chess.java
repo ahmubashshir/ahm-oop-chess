@@ -1,13 +1,13 @@
 package bd.ac.miu.cse.b60.oop.ahm;
 
-import java.util.Scanner;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
+import bd.ac.miu.cse.b60.oop.ahm.chess.CLIDisplay;
 import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
-
+import bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult;
 /**
  * Entry point class for the {@code Chess} game.
  * Handles the main menu, user input, and game loop.
@@ -17,49 +17,11 @@ public final class Chess {
 	/** Default time limit for each player. */
 	public static final LocalTime timeLimit = LocalTime.parse("05:00");
 
-	/** {@code Scanner} object used for reading user input. */
-	private Scanner input;
-
 	/**
 	 * Constructs a new {@code Chess} instance and initializes the {@code Scanner}.
 	 */
-	public Chess() {
-		input = new Scanner(System.in);
-	}
+	public Chess() {}
 
-	/**
-	 * Closes the {@code Scanner} used for input.
-	 */
-	public void stop() {
-		input.close();
-	}
-
-	/**
-	 * Displays the main menu and reads the user's choice.
-	 *
-	 * @return the integer corresponding to the user's menu selection
-	 */
-	public int mainMenu() {
-		System.out.println("1. Start a new game");
-		System.out.println("2. Exit");
-		System.out.print("Your choice: ");
-		return input.nextInt();
-	}
-
-	/**
-	 * Prompts the user to enter a coordinate on the board.
-	 *
-	 * @param query a {@code String} describing which coordinate to enter
-	 * @return a {@code Coord} object containing the column and row, or {@code null} if the user enters -1
-	 */
-	public Coord getCoord(String query) {
-		System.out.print(String.format("Enter the position %s ('-1' to quit) (col row): ", query));
-		int col = input.nextInt();
-		if (col == -1) return null;
-		int row = input.nextInt();
-		if (row == -1) return null;
-		return new Coord(col - 1, row -1);
-	}
 
 	/**
 	 * Entry point of the {@code Chess} game.
@@ -67,14 +29,14 @@ public final class Chess {
 	 * @param args command-line arguments (not used)
 	 */
 	public static final void main(String[] args) {
-		Chess chess = new Chess();
+		CLIDisplay disp = new CLIDisplay();
 		Game game = null;
 
+		System.out.print("\033[H\033[2J");
 		while (true) {
-			int mainMenuSelection = chess.mainMenu();
-
-			if (mainMenuSelection == 1) { // Start game
-				game = new Game(timeLimit);
+			switch(disp.mainMenu()) {
+			case START: { // Start game
+				game = new Game(timeLimit, disp);
 				game.initializePiecePositions();
 				game.setMaxNumOfTurns(10);
 
@@ -134,14 +96,14 @@ public final class Chess {
 
 					Coord src, dst;
 					try {
-						src = chess.getCoord("of piece to move");
+						src = disp.getCoord("of piece to move");
 						if (src == null) {
 							System.out.println("Game ended forcefully.");
 							game.end();
 							break;
 						}
 
-						dst = chess.getCoord("of the square to move the piece to");
+						dst = disp.getCoord("of the square to move the piece to");
 						if (dst == null) {
 							System.out.println("Game ended forcefully.");
 							game.end();
@@ -149,8 +111,10 @@ public final class Chess {
 						}
 
 						System.out.print("\033[H\033[2J");
-					} catch (IllegalArgumentException e) {
+					} catch (IllegalArgumentException|StringIndexOutOfBoundsException e) {
+						System.out.print("\033[H\033[2J");
 						System.out.println("ERROR: Invalid parameters!");
+						System.out.println(e);
 						continue;
 					}
 
@@ -171,17 +135,18 @@ public final class Chess {
 						System.out.println(String.format("ERROR: %s", moveStatus.info));
 					}
 				}
-
-			} else if (mainMenuSelection == 2) {
+			};
+			break;
+			case EXIT: {
 				System.out.println("Thank you for playing");
 				if (game != null) game.end();
-				break;
-			} else {
+				return;
+			}
+			default:
 				System.out.println("ERROR: Invalid menu selection!");
+				break;
 			}
 		}
-
-		chess.stop();
 	}
 
 	/**

@@ -118,7 +118,7 @@ public class Game {
 	 * @param timeLimit The time limit for each player.
 	 */
 	public Game(LocalTime timeLimit) {
-		this(timeLimit, new Display());
+		this(timeLimit, new CLIDisplay());
 	}
 
 	/**

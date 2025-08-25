@@ -24,4 +24,18 @@ public class Coord {
 		this.col = col;
 		this.row = row;
 	}
+
+	/**
+	 * Constructs a {@code Coord} with the specified column and row.
+	 *
+	 * @param col the column index, must be between {@code 'a'} and {@code 'h'}.
+	 * @param row the row index, must be between {@code '0'} and {@code '7'}.
+	 * @throws IllegalArgumentException if {@code col} or {@code row} is outside the valid range.
+	 */
+	public Coord(char col, char row) {
+		if(col > 'h' || col < 'a' || row > '8' || row < '1')
+			throw new IllegalArgumentException("Coordinate not valid!");
+		this.col = col - 'a';
+		this.row = row - '1';
+	}
 }
