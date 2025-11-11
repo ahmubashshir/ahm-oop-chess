@@ -6,6 +6,14 @@ import java.time.LocalTime;
 
 /**
  * Represents a chess game with a board, players, and methods for moves.
+ *
+ * <p>The Game class is the central controller for chess gameplay, managing the board state,
+ * player turns, piece movement, and game rules enforcement.</p>
+ *
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.Display
  */
 public class Game {
 
@@ -21,21 +29,30 @@ public class Game {
 
 	/**
 	 * The game board as a 2D array of squares.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
 	 */
 	private Square[][] board;
 
 	/**
 	 * Array of players in the game.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
 	 */
 	private Player[] players;
 
 	/**
 	 * The current player making a move.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
 	 */
 	private Player currentPlayer;
 
 	/**
 	 * The display for the game.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Display
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay
 	 */
 	private Display display;
 
@@ -123,6 +140,8 @@ public class Game {
 	 * Initializes a new game with a time limit.
 	 *
 	 * @param timeLimit The time limit for each player.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay
 	 */
 	public Game(LocalTime timeLimit) {
 		this(timeLimit, new CLIDisplay());
@@ -161,6 +180,13 @@ public class Game {
 
 	/**
 	 * Initializes the positions of chess pieces on the board.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Rook
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Knight
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Bishop
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Queen
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.King
 	 */
 	public void initializePiecePositions() {
 		// Initialize pieces for the white player
@@ -244,6 +270,10 @@ public class Game {
 	 * @param src Source square coordinates.
 	 * @param dst Destination square coordinates.
 	 * @return {@code MoveStatus} indicating the result of the move.
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.King
 	 */
 	public MoveStatus move(Coord src, Coord dst) {
 		Square sourceSquare = board[src.row][src.col];

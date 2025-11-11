@@ -2,12 +2,26 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 /**
  * Represents a generic chess piece, serving as the base class for all specific chess pieces.
+ *
+ * <p>This abstract class defines the common properties and behaviors that all chess pieces share.
+ * Specific piece types (King, Queen, Rook, etc.) extend this class to implement their unique movement patterns.</p>
+ *
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.King
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Queen
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Rook
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Bishop
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Knight
+ * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn
  */
 public abstract class Piece {
+
 	/** The formatted name of the piece, including its color tag. */
 	private String name;
 
-	/** The color of the piece (white or black). */
+	/**
+	 * The color of the piece (white or black).
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Color
+	 */
 	private final Color color;
 
 	/** Indicates whether the piece has been captured. */
@@ -79,9 +93,11 @@ public abstract class Piece {
 	 * @param dst       Destination square coordinates.
 	 * @param board     the chessboard as a 2D array of {@code Square} objects
 	 * @return {@code true} if the move is valid, {@code false} otherwise
+	 *
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
 	 */
 	public boolean isValidMove(Coord src, Coord dst, Square[][] board) {
 		return isValidMove(src.row, src.col, dst.row, dst.col, board);
 	}
-
 }

@@ -9,7 +9,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 import java.util.Scanner;
 
 /**
- * The {@code Display} class is responsible for printing the current state of
+ * The {@code CLIDisplay} class is responsible for printing the current state of
  * the chessboard and the captured pieces of each player to the console.
  */
 public class CLIDisplay extends Display {
@@ -30,7 +30,7 @@ public class CLIDisplay extends Display {
 		int cellWidth = 10; // Cell width modifier
 
 		System.out.println(
-		    "       a          b          c          d          e          f          h          h"
+		    "       a          b          c          d          e          f          g          h"
 		);
 
 		// Print top of the board outline
@@ -82,7 +82,7 @@ public class CLIDisplay extends Display {
 		}
 
 		System.out.println(
-		    "       a          b          c          d          e          f          h          h"
+		    "       a          b          c          d          e          f          g          h"
 		);
 	}
 

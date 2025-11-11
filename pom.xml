@@ -56,6 +56,15 @@
           <quiet>true</quiet>
           <show>package</show>
           <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
+          <doclet>nl.talsmasoftware.umldoclet.UMLDoclet</doclet>
+          <docletArtifact>
+            <groupId>nl.talsmasoftware</groupId>
+            <artifactId>umldoclet</artifactId>
+            <version>2.1.0</version>
+          </docletArtifact>
+          <additionalOptions>
+            <additionalOption>-umlImageFormat SVG</additionalOption>
+          </additionalOptions>
         </configuration>
       </plugin>
     </plugins>
@@ -66,6 +75,12 @@
       <artifactId>junit-jupiter</artifactId>
       <version>5.11.3</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nl.talsmasoftware</groupId>
+      <artifactId>umldoclet</artifactId>
+      <version>2.1.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
