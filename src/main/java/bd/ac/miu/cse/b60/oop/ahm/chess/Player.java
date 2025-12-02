@@ -3,6 +3,7 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 import java.time.LocalTime;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 /**
  * Represents a chess player with a unique ID, timer, and methods to manage time and captured pieces.
@@ -27,11 +28,8 @@ public class Player {
 	/** Indicates whether the time limit has been reached. */
 	private boolean isTimeFinished = false;
 
-	/** Number of pieces captured by the player. */
-	private int capturedCount;
-
 	/** Array of pieces captured by the player. */
-	private Piece[] capturedPieces;
+	private Vector<Piece> capturedPieces;
 
 	/** Number of turns taken by the player. */
 	private int numOfTurns = 0;
@@ -46,8 +44,7 @@ public class Player {
 	 */
 	public Player(int id) {
 		playerID = id;
-		capturedPieces = new Piece[16];
-		capturedCount = 0;
+		capturedPieces = new Vector<>();
 	}
 
 	/**
@@ -59,8 +56,7 @@ public class Player {
 	public Player(int id, LocalTime timeLimit) {
 		playerID = id;
 		this.timeLimit = timeLimit;
-		capturedPieces = new Piece[16];
-		capturedCount = 0;
+		capturedPieces = new Vector<>();
 	}
 
 	/**
@@ -78,9 +74,7 @@ public class Player {
 	 * @param capturedPiece the {@code Piece} captured by the player
 	 */
 	public void capturePiece(Piece capturedPiece) {
-		if (capturedCount < capturedPieces.length) {
-			capturedPieces[capturedCount++] = capturedPiece;
-		}
+		capturedPieces.add(capturedPiece);
 	}
 
 	/**
@@ -89,16 +83,7 @@ public class Player {
 	 * @return an array of captured {@code Piece} objects
 	 */
 	public Piece[] getCapturedPieces() {
-		return capturedPieces;
-	}
-
-	/**
-	 * Returns the number of pieces captured.
-	 *
-	 * @return the count of captured pieces
-	 */
-	public int getCapturedCount() {
-		return capturedCount;
+		return capturedPieces.toArray(new Piece[capturedPieces.size()]);
 	}
 
 	/**

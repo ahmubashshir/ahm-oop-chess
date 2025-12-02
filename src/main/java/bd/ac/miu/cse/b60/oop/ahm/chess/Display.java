@@ -49,12 +49,8 @@ public interface Display {
 	 *
 	 * <p>This method renders the game's main menu and handles user selection.
 	 * It can be implemented as a no-op in event-driven UI implementations.</p>
-	 *
-	 * @return the {@code MenuResult} corresponding to the user's menu selection
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult
-	 * @see bd.ac.miu.cse.b60.oop.ahm.Chess
 	 */
-	MenuResult mainMenu();
+	void showMainMenu();
 
 	/**
 	 * Starts the display event loop.
@@ -106,32 +102,6 @@ public interface Display {
 	void showCheckWarning();
 
 	/**
-	 * Checks if the user has requested to exit the game during coordinate input.
-	 *
-	 * @return true if the user has requested to exit, false otherwise
-	 */
-	default boolean isExitRequested() {
-		return false;
-	}
-
-	/**
-	 * Resets the exit request flag.
-	 */
-	default void resetExitFlag() {
-		// Default implementation does nothing
-	}
-
-	/**
-	 * Signals that the current game has ended.
-	 * This allows display implementations to clean up or reset their game loop state.
-	 */
-	default void endGame() {
-		// Default implementation does nothing
-	}
-
-	// No clearDisplay method - screen clearing is an implementation detail of CLIDisplay
-
-	/**
 	 * Registers a listener for piece move events.
 	 *
 	 * @param listener the listener to be notified when a piece move is requested
@@ -143,7 +113,7 @@ public interface Display {
 	 *
 	 * @param listener the listener to be notified when a menu item is selected
 	 */
-	void addMenuListener(MenuListener listener);
+	void addMenuListener(StateListener listener);
 
 	/**
 	 * Interface for move event listeners.
@@ -161,12 +131,12 @@ public interface Display {
 	/**
 	 * Interface for menu event listeners.
 	 */
-	interface MenuListener {
+	interface StateListener {
 		/**
 		 * Called when a menu selection is made by the user.
 		 *
 		 * @param result the selected menu option
 		 */
-		void onMenuSelected(MenuResult result);
+		void onStateChange(State result);
 	}
 }

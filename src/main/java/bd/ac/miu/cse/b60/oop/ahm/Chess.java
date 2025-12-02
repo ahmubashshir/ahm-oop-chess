@@ -3,9 +3,9 @@ package bd.ac.miu.cse.b60.oop.ahm;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Display;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
-import bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult;
 import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
+import bd.ac.miu.cse.b60.oop.ahm.chess.State;
 import bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay;
 import java.time.LocalTime;
 
@@ -14,14 +14,13 @@ import java.time.LocalTime;
  * Handles the main menu, user input, and game loop.
  * All I/O operations are delegated to the Display interface.
  */
-public final class Chess implements Display.MenuListener, Display.MoveListener {
+public final class Chess implements Display.StateListener, Display.MoveListener {
 
 	/** Default time limit for each player. */
 	public static final LocalTime timeLimit = LocalTime.parse("05:00");
 
 	private Display display;
 	private Game game;
-	private boolean gameInProgress = false;
 
 	/**
 	 * Constructs a new {@code Chess} instance.
@@ -40,6 +39,12 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		display.run();
 	}
 
+	private void endGame() {
+		if (game == null) return;
+		game.end();
+		game = null;
+	}
+
 	/**
 	 * Entry point of the {@code Chess} game.
 	 *
@@ -51,28 +56,29 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 
 		// Create and setup game controller
 		Chess chess = new Chess(display);
-
 		chess.run();
 	}
 
 	/**
-	 * Handle menu selection events from the display
+	 * Handle game state changes from the display
 	 *
-	 * @param result the selected menu option
+	 * @param state current game state
 	 */
 	@Override
-	public void onMenuSelected(MenuResult result) {
-		switch (result) {
+	public void onStateChange(State state) {
+		switch (state) {
 		case START: {
-			startNewGame();
+			newGame();
+			break;
+		}
+		case END: {
+			endGame();
 			break;
 		}
 		case EXIT: {
 			if (game != null) {
-				game.end();
+				display.showMessage("End current game first.");
 			}
-			display.showMessage("Thank you for playing");
-			System.exit(0); // Ensure application exits properly
 			break;
 		}
 		default:
@@ -89,7 +95,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 	 */
 	@Override
 	public void onMoveRequested(Coord source, Coord destination) {
-		if (!gameInProgress || game == null) {
+		if (game == null) {
 			return;
 		}
 
@@ -115,7 +121,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 	/**
 	 * Start a new chess game
 	 */
-	private void startNewGame() {
+	private void newGame() {
 		// Start game
 		// Start a new game
 		game = new Game(timeLimit);
@@ -133,12 +139,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		currentPlayer.startTimer();
 		currentPlayer.pauseTimer();
 		game.switchPlayer();
-
-		// Set game in progress flag
-		gameInProgress = true;
-
 		updateGameState();
-
 		// The game loop is now handled by the display implementation
 	}
 
@@ -163,13 +164,8 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 	 * This should be called whenever the game state changes.
 	 */
 	public void updateGameState() {
-		if (!gameInProgress) {
+		if (game == null || isGameOver()) {
 			return;
-		}
-
-		// Check game state
-		if (checkGameState()) {
-			return; // Game is over
 		}
 
 		// Display current game state
@@ -183,8 +179,8 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 	 *
 	 * @return true if the game is over, false otherwise
 	 */
-	private boolean checkGameState() {
-		if (!gameInProgress) return true;
+	private boolean isGameOver() {
+		if (game == null) return true;
 
 		Player currentPlayer = game.getCurrentPlayer();
 		String playerColor = currentPlayer.getPlayerID() == 1
@@ -196,27 +192,21 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 			display.showGameEnd(
 			    "Both players have run out of turns, game ends in a draw"
 			);
-			game.end();
-			gameInProgress = false;
-			display.endGame();
+			endGame();
 			return true;
 		} else if (game.isTimeFinished()) {
 			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    playerColor + " loses as they ran out of time."
 			);
-			game.end();
-			gameInProgress = false;
-			display.endGame();
+			endGame();
 			return true;
 		} else if (!game.isKingAlive()) {
 			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    playerColor + " King is dead, they lose the game"
 			);
-			game.end();
-			gameInProgress = false;
-			display.endGame();
+			endGame();
 			return true;
 		} else if (game.isCheck()) {
 			display.showCheckWarning();

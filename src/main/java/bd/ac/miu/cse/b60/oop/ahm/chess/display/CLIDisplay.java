@@ -4,11 +4,11 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Display;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
-import bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult;
 import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
+import bd.ac.miu.cse.b60.oop.ahm.chess.State;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,9 +24,10 @@ public class CLIDisplay implements Display {
 
 	private Scanner input;
 	private List<MoveListener> moveListeners;
-	private List<MenuListener> menuListeners;
+	private List<StateListener> menuListeners;
 	private boolean isRunning;
 	private boolean exitRequested;
+	private boolean disableScreenClear = false;
 
 	/** Default Constructor */
 	public CLIDisplay() {
@@ -56,63 +57,27 @@ public class CLIDisplay implements Display {
 		// Show captured pieces at the top for better user experience
 		final Square[][] board = game.getBoard();
 
-		int cellWidth = 10; // Cell width modifier
-
-		System.out.println(
-		    "       a          b          c          d          e          f          g          h"
-		);
-
-		// Print top of the board outline
-		System.out.print("  ");
-		for (int i = 0; i < 89; i++) {
-			System.out.print("-");
-		}
-
-		System.out.println(); // Create new line
+		System.out.println("  a b c d e f g h");
+		System.out.println(" -----------------");
 
 		for (int row = 0; row < board.length; row++) {
-			System.out.print(String.format("%d |", row + 1)); // Leftmost board outline
+			System.out.print(row + 1); // Leftmost board outline
 			for (int col = 0; col < board[row].length; col++) {
+				System.out.print("|");
 				if (
-				    board[row][col] != null &&
-				    board[row][col].getPiece() != null
-				) {
-					// Piece exists, print piece name
-					String pieceName = board[row][col].getPiece().getName();
-					System.out.print(
-					    String.format("%-" + cellWidth + "s", pieceName)
-					);
-				} else {
-					// No piece, print empty space
-					System.out.print(String.format("%-" + cellWidth + "s", ""));
-				}
-
-				// Print vertical separator
-				if (col < board[row].length) {
-					System.out.print("|");
-				}
+				    board[row][col] == null ||
+				    board[row][col].getPiece() == null
+				) System.out.print(" ");
+				else System.out.print(board[row][col].getPiece().getSymbol());
 			}
 
-			System.out.print(" " + (row + 1));
+			System.out.print(String.format("|%d", row + 1));
 			System.out.println();
-
-			// Print horizontal separator
-			if (row < board.length) {
-				System.out.print("  ");
-				for (
-				    int i = 0;
-				    i < (board[row].length + 1) * cellWidth - 1;
-				    i++
-				) {
-					System.out.print("-");
-				}
-				System.out.println();
-			}
 		}
 
-		System.out.println(
-		    "       a          b          c          d          e          f          g          h"
-		);
+		// Print horizontal separator
+		System.out.println("  -----------------");
+		System.out.println("   a b c d e f g h");
 	}
 
 	/**
@@ -124,22 +89,16 @@ public class CLIDisplay implements Display {
 	 */
 	@Override
 	public void updateCapturedPieces(final Game game) {
-		System.out.println("\nCAPTURED PIECES:");
-		System.out.println("----------------");
-
 		for (Color color : Color.values()) {
-			System.out.println(
-			    "Player " + (color.id + 1) + "'s Captured Pieces:"
-			);
+			System.out.print(String.format("%s captured: ", color.name));
 			final Player player = game.getPlayer(color.id);
 			Piece[] capturedPieces = player.getCapturedPieces();
-			int capturedCount = player.getCapturedCount();
 
-			if (capturedCount == 0) {
-				System.out.println("  None");
+			if (capturedPieces.length == 0) {
+				System.out.print(" none");
 			} else {
-				for (int i = 0; i < capturedCount; i++) {
-					System.out.println("  " + capturedPieces[i].getName());
+				for (Piece piece : capturedPieces) {
+					System.out.print(String.format(" %s", piece.getSymbol()));
 				}
 			}
 
@@ -179,24 +138,14 @@ public class CLIDisplay implements Display {
 			System.out.println("Exiting game...");
 			return null;
 		}
-
-		// Show what was entered without clearing the screen
-		System.out.println(String.format("You entered: %s", in));
-
-		// Do NOT clear the screen here - that should only happen after both coordinates
-		// are entered and validated in gameLoop()
-
 		return new Coord(in.charAt(0 /* col */), in.charAt(1 /* row */));
 	}
 
 	/**
-	 * Displays the main menu and reads the user's choice.
-	 * This is a synchronous operation that blocks until a selection is made.
-	 *
-	 * @return the {@code MenuResult} corresponding to the user's menu selection
+	 * Displays the main menu.
 	 */
 	@Override
-	public MenuResult mainMenu() {
+	public void showMainMenu() {
 		// Clear screen before showing menu (one of the allowed places)
 		clearScreen();
 
@@ -209,35 +158,24 @@ public class CLIDisplay implements Display {
 
 		// Print the prompt without a newline
 		System.out.print("Your choice: ");
+	}
 
-		MenuResult result;
+	private State readMenuChoice() {
+		State result;
 		// Handle case where there's no input available
 		if (input.hasNextInt()) {
-			result = MenuResult.fromInt(input.nextInt());
+			result = State.fromInt(input.nextInt());
+			clearScreen();
 		} else {
 			// Default to starting a new game if no input available
+			clearScreen();
 			System.out.println("No input detected, defaulting to new game");
-			result = MenuResult.START;
+			result = State.START;
 			if (input.hasNext()) {
 				input.next(); // Consume whatever is there
 			}
 		}
-
-		// Don't notify listeners here - the run() method will do that
-		// This prevents double notification
-
-		if (result == MenuResult.EXIT) {
-			input.close();
-			isRunning = false;
-		}
-
-		// Display a confirmation message about the selection
-		if (result == MenuResult.START) {
-			System.out.println("Starting a new game...");
-		} else if (result == MenuResult.EXIT) {
-			System.out.println("Exiting the game...");
-		}
-
+		notifyStateListeners(result);
 		return result;
 	}
 
@@ -252,30 +190,24 @@ public class CLIDisplay implements Display {
 		// Main application loop
 		while (isRunning) {
 			// Display the main menu and get user choice
-			MenuResult menuResult = mainMenu();
-			clearScreen(); // Clear screen before game start
+			showMainMenu();
+			State result = readMenuChoice();
 
-			// Notify all menu listeners
-			for (MenuListener listener : menuListeners) {
-				listener.onMenuSelected(menuResult);
-			}
-
-			// If user chose to exit, break the loop
-			if (menuResult == MenuResult.EXIT) {
+			switch (result) {
+			case EXIT:
 				isRunning = false;
+				System.out.println("Exiting the game...");
+				break;
+			case START:
+				gameLoop();
+				delay(1000);
+				notifyStateListeners(State.END);
+				break;
+			default:
 				break;
 			}
-
-			// If game is started, clear screen (one of the allowed places) and enter the game loop
-			if (menuResult == MenuResult.START) {
-				gameLoop();
-				// After the game loop ends, display the main menu again
-				// unless the application is exiting
-				if (isRunning) {
-					clearScreen(); // Clear screen before showing menu again
-				}
-			}
 		}
+		input.close();
 	}
 
 	/**
@@ -285,6 +217,7 @@ public class CLIDisplay implements Display {
 	private void gameLoop() {
 		boolean gameInProgress = true;
 
+		System.out.println("Starting a new game...");
 		while (gameInProgress && isRunning) {
 			// Get moves from the player
 			Coord src, dst;
@@ -292,30 +225,28 @@ public class CLIDisplay implements Display {
 				src = getCoord("of piece to move");
 				if (src == null) {
 					// Check if user requested to exit (entered 'q')
-					if (isExitRequested()) {
+					if (exitRequested) {
 						showMessage("Returning to main menu...");
-						resetExitFlag();
-						gameInProgress = false;
-						break;
+						exitRequested = gameInProgress = false;
+						continue;
 					} else {
 						showGameEnd("Game ended forcefully.");
 						gameInProgress = false;
-						break;
+						continue;
 					}
 				}
 
 				dst = getCoord("of the square to move the piece to");
 				if (dst == null) {
 					// Check if user requested to exit (entered 'q')
-					if (isExitRequested()) {
+					if (exitRequested) {
 						showMessage("Returning to main menu...");
-						resetExitFlag();
-						gameInProgress = false;
-						break;
+						exitRequested = gameInProgress = false;
+						continue;
 					} else {
 						showGameEnd("Game ended forcefully.");
 						gameInProgress = false;
-						break;
+						continue;
 					}
 				}
 
@@ -353,7 +284,7 @@ public class CLIDisplay implements Display {
 	 * @param listener the listener to be notified when a menu item is selected
 	 */
 	@Override
-	public void addMenuListener(MenuListener listener) {
+	public void addMenuListener(StateListener listener) {
 		menuListeners.add(listener);
 	}
 
@@ -378,7 +309,7 @@ public class CLIDisplay implements Display {
 	@Override
 	public void showError(String message) {
 		// Display error messages directly without clearing screen
-		System.out.println("❌ ERROR: " + message);
+		System.out.println(String.format("❌ ERROR: %s", message));
 	}
 
 	// clearScreen is defined above
@@ -391,37 +322,21 @@ public class CLIDisplay implements Display {
 	 * 3. After reading the destination coordinate
 	 */
 	private void clearScreen() {
+		if (disableScreenClear) {
+			System.out.println("<clearScreen>");
+			return;
+		}
+
 		System.out.print("\033[H\033[2J");
 		System.out.flush(); // Ensure the clear command is sent immediately
 	}
 
-	/**
-	 * Signals to the display that the game has ended.
-	 * This is called by the Chess class to notify the display to exit the game loop.
-	 */
-	@Override
-	public void endGame() {
-		// This method is called when the game is over
-		// It signals that the current game loop should end
-		// The main loop will continue and return to the menu
-	}
-
-	/**
-	 * Checks if the user has requested to exit the game.
-	 *
-	 * @return true if the user entered 'q' during coordinate input
-	 */
-	@Override
-	public boolean isExitRequested() {
-		return exitRequested;
-	}
-
-	/**
-	 * Resets the exit requested flag.
-	 */
-	@Override
-	public void resetExitFlag() {
-		exitRequested = false;
+	private void delay(int milliseconds) {
+		try {
+			Thread.sleep(milliseconds);
+		} catch (InterruptedException e) {
+			// Ignore interruption
+		}
 	}
 
 	/**
@@ -437,11 +352,12 @@ public class CLIDisplay implements Display {
 		System.out.println(
 		    "-----------------------------------------------------"
 		);
-		System.out.println(playerColor + " Player's turn.");
 		System.out.println(
-		    playerColor +
-		    " Player's time consumed so far: " +
-		    formatTime(timeConsumed)
+		    String.format(
+		        "%s's turn, time consumed so far: ",
+		        playerColor,
+		        formatTime(timeConsumed)
+		    )
 		);
 		System.out.println(
 		    "-----------------------------------------------------"
@@ -473,6 +389,7 @@ public class CLIDisplay implements Display {
 	public void showGameEnd(String message) {
 		// Clear screen before showing game end message
 		clearScreen();
+		delay(1000);
 		System.out.println(
 		    "====================================================="
 		);
@@ -514,6 +431,12 @@ public class CLIDisplay implements Display {
 	private void notifyMoveListeners(Coord source, Coord destination) {
 		for (MoveListener listener : moveListeners) {
 			listener.onMoveRequested(source, destination);
+		}
+	}
+
+	private void notifyStateListeners(State result) {
+		for (StateListener listener : menuListeners) {
+			listener.onStateChange(result);
 		}
 	}
 }
