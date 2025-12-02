@@ -108,8 +108,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 				updateGameState();
 			}
 		} catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
-			display.showError("Invalid parameters!");
-			display.showMessage(e.toString());
+			display.showError(e.getMessage());
 		}
 	}
 
@@ -167,8 +166,6 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		if (!gameInProgress) {
 			return;
 		}
-
-		Player currentPlayer = game.getCurrentPlayer();
 
 		// Check game state
 		if (checkGameState()) {

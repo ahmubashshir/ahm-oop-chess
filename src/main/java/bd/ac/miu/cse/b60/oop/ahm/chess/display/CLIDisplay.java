@@ -324,17 +324,13 @@ public class CLIDisplay implements Display {
 				clearScreen();
 
 				// Notify all move listeners
-				for (MoveListener listener : moveListeners) {
-					listener.onMoveRequested(src, dst);
-				}
+				notifyMoveListeners(src, dst);
 			} catch (
 				    IllegalArgumentException
 				    | StringIndexOutOfBoundsException e
 				) {
+				showError(e.getMessage());
 				// Show error without clearing screen to preserve board display
-				showError("Invalid parameters!");
-				showMessage(e.toString());
-
 				// We don't need to redisplay the board here
 				// The board should still be visible since we didn't clear the screen
 			}
@@ -382,7 +378,7 @@ public class CLIDisplay implements Display {
 	@Override
 	public void showError(String message) {
 		// Display error messages directly without clearing screen
-		System.out.println("ERROR: " + message);
+		System.out.println("❌ ERROR: " + message);
 	}
 
 	// clearScreen is defined above
@@ -461,9 +457,9 @@ public class CLIDisplay implements Display {
 	public void showMoveStatus(MoveStatus status) {
 		// Display move status directly without clearing screen
 		if (status == MoveStatus.Ok) {
-			System.out.println("✓ Moved successfully, turn ending.");
+			showMessage("✓ Moved successfully, turn ending.");
 		} else {
-			System.out.println(String.format("❌ ERROR: %s", status.info));
+			showError(status.info);
 		}
 	}
 
