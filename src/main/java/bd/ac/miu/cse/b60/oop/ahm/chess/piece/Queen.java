@@ -30,6 +30,15 @@ public class Queen extends Piece {
 	}
 
 	/**
+	 * Returns the symbol representation of the queen piece.
+	 *
+	 * @return The symbol representation of the queen piece.
+	 */
+	public String getSymbol() {
+		return isWhite() ? "♕" : "♛";
+	}
+
+	/**
 	 * Checks if the move for the queen from the source position to the destination
 	 * position is valid.
 	 * The move must be either horizontal, vertical, or diagonal, and there should

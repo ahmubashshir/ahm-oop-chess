@@ -25,6 +25,15 @@ public class Bishop extends Piece {
 	}
 
 	/**
+	 * Returns the symbol representing the piece.
+	 *
+	 * @return the symbol of the piece
+	 */
+	public String getSymbol() {
+		return isWhite() ? "♗" : "♝";
+	}
+
+	/**
 	 * Checks if a move from the source square to the destination square is a valid diagonal move for the bishop.
 	 *
 	 * @param sourceRow the row index of the source square.

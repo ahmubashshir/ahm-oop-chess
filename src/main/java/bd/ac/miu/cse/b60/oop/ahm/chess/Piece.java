@@ -53,6 +53,13 @@ public abstract class Piece {
 	}
 
 	/**
+	 * Returns the symbol representing the piece.
+	 *
+	 * @return the symbol of the piece
+	 */
+	public abstract String getSymbol();
+
+	/**
 	 * Sets the captured status of the piece.
 	 *
 	 * @param isCaptured {@code true} if the piece is captured, {@code false} otherwise
@@ -75,7 +82,7 @@ public abstract class Piece {
 	 *
 	 * @return {@code true} if the piece is white, {@code false} if black
 	 */
-	public boolean getIsWhite() {
+	public boolean isWhite() {
 		return color == Color.WHITE;
 	}
 

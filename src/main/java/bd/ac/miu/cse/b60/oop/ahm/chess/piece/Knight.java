@@ -26,6 +26,15 @@ public class Knight extends Piece {
 	}
 
 	/**
+	 * Returns the symbol representation of the knight.
+	 *
+	 * @return The symbol representation of the knight
+	 */
+	public String getSymbol() {
+		return isWhite() ? "♘" : "♞";
+	}
+
+	/**
 	 * Checks if the proposed move for the knight is valid based on the rules of chess.
 	 * The knight moves in an L-shaped pattern, two squares in one direction and one square
 	 * perpendicular to that direction, or vice versa.

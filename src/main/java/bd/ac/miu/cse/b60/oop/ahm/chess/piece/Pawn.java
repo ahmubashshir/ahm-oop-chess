@@ -28,6 +28,15 @@ public class Pawn extends Piece {
 	}
 
 	/**
+	 * Returns the symbol representation of the pawn.
+	 *
+	 * @return The symbol representation of the pawn.
+	 */
+	public String getSymbol() {
+		return isWhite() ? "♙" : "♟";
+	}
+
+	/**
 	 * Checks if a move from the source position to the destination position is a valid move for the pawn.
 	 *
 	 * The method considers the current state of the chessboard and the specific rules for pawn movement.
@@ -48,7 +57,7 @@ public class Pawn extends Piece {
 
 		int direction;
 		// Get direction of pawn reliant on what color
-		if (getIsWhite()) {
+		if (isWhite()) {
 			direction = 1;
 		} else {
 			direction = -1;
@@ -91,7 +100,7 @@ public class Pawn extends Piece {
 				Piece targetPiece = board[destRow][destCol].getPiece();
 				return (
 				           (targetPiece != null) &&
-				           (targetPiece.getIsWhite() != getIsWhite())
+				           (targetPiece.isWhite() != isWhite())
 				       );
 			}
 		}

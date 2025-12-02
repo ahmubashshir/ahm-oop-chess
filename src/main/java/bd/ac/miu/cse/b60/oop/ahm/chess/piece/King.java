@@ -40,6 +40,15 @@ public class King extends Piece {
 	}
 
 	/**
+	 * Returns the symbol representation of the king.
+	 *
+	 * @return The symbol representation of the king
+	 */
+	public String getSymbol() {
+		return isWhite() ? "♔" : "♚";
+	}
+
+	/**
 	 * Determines whether a move from the source square to the destination square
 	 * is valid for a {@code King}.
 	 * Supports both regular one-square moves in any direction and castling.

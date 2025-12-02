@@ -28,6 +28,15 @@ public class Rook extends Piece {
 	}
 
 	/**
+	 * Returns the symbol representation of the rook.
+	 *
+	 * @return The symbol representation of the rook.
+	 */
+	public String getSymbol() {
+		return isWhite() ? "♖" : "♜";
+	}
+
+	/**
 	 * Checks if a move from the source square to the destination square is a valid move for the rook.
 	 *
 	 * @param sourceRow the row index of the source square.

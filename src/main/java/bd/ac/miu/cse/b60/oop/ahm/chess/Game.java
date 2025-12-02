@@ -248,8 +248,8 @@ public class Game {
 
 		// Check if player is moving their own piece
 		if (
-		    !((currentPlayer.getPlayerID() == 0 && pieceToMove.getIsWhite()) ||
-		      (currentPlayer.getPlayerID() == 1 && !pieceToMove.getIsWhite()))
+		    !((currentPlayer.getPlayerID() == 0 && pieceToMove.isWhite()) ||
+		      (currentPlayer.getPlayerID() == 1 && !pieceToMove.isWhite()))
 		) return MoveStatus.PlayerError;
 
 		// Check if the move is valid for the specific piece
@@ -257,7 +257,7 @@ public class Game {
 			// Check if the destination square is empty or has an opponent's piece
 			if (
 			    destSquare.getPiece() == null ||
-			    destSquare.getPiece().getIsWhite() != pieceToMove.getIsWhite()
+			    destSquare.getPiece().isWhite() != pieceToMove.isWhite()
 			) {
 				// Capture the opponent’s piece if it exists
 				if (destSquare.getPiece() != null) {
@@ -271,7 +271,7 @@ public class Game {
 				    Math.abs(dst.col - src.col) == 2
 				) {
 					// Ensure king is in starting position and correct player
-					boolean isWhite = pieceToMove.getIsWhite();
+					boolean isWhite = pieceToMove.isWhite();
 					if (
 					    (isWhite &&
 					     src.row == 0 &&
@@ -338,7 +338,7 @@ public class Game {
 					if (board[row][col].getPiece() instanceof King) {
 						// Check if block is king
 						if (
-						    board[row][col].getPiece().getIsWhite() ==
+						    board[row][col].getPiece().isWhite() ==
 						    currentKingColor
 						) {
 							// Check if king is same color as
@@ -358,8 +358,8 @@ public class Game {
 				) {
 					// Check if block is empty
 					if (
-					    (board[row][col].getPiece().getIsWhite() !=
-					     board[currentKingRow][currentKingCol].getPiece().getIsWhite())
+					    (board[row][col].getPiece().isWhite() !=
+					     board[currentKingRow][currentKingCol].getPiece().isWhite())
 					) {
 						pieceToCheck = board[row][col].getPiece();
 						if (
@@ -400,7 +400,7 @@ public class Game {
 				) if (
 					    board[row][col].getPiece() instanceof King // Check if block is king
 					) if (
-						    board[row][col].getPiece().getIsWhite() == currentKingColor // Check if king is same color as
+						    board[row][col].getPiece().isWhite() == currentKingColor // Check if king is same color as
 						) return true;
 		return false;
 	}
