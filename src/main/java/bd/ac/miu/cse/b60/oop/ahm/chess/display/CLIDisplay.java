@@ -1,7 +1,9 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess.display;
 
+import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Coord;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Display;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.MenuResult;
 import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
@@ -42,14 +44,17 @@ public class CLIDisplay implements Display {
 
 	/**
 	 * Prints the current state of the chessboard to the console.
-	 * This clears the screen first to provide a clean display.
+	 * The screen should not be cleared here as the board needs to be visible
+	 * during move input.
 	 *
-	 * @param board a 2D array of {@code Square} representing the chessboard.
+	 * @param game the current game state
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
 	@Override
-	public void printBoard(Square[][] board) {
-		// Clear the screen before displaying the board
-		clearScreen();
+	public void updateBoard(final Game game) {
+		// Do not clear the screen here - keep the board visible during move input
+		// Show captured pieces at the top for better user experience
+		final Square[][] board = game.getBoard();
 
 		int cellWidth = 10; // Cell width modifier
 
@@ -114,17 +119,19 @@ public class CLIDisplay implements Display {
 	 * Prints the captured pieces for each player.
 	 * This does not clear the screen as it's usually displayed along with the board.
 	 *
-	 * @param players an array of {@code Player} objects representing the players in the game.
+	 * @param game the current game state
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
 	@Override
-	public void printCapturedPieces(Player[] players) {
+	public void updateCapturedPieces(final Game game) {
 		System.out.println("\nCAPTURED PIECES:");
 		System.out.println("----------------");
 
-		for (Player player : players) {
+		for (Color color : Color.values()) {
 			System.out.println(
-			    "Player " + player.getPlayerID() + "'s Captured Pieces:"
+			    "Player " + (color.id + 1) + "'s Captured Pieces:"
 			);
+			final Player player = game.getPlayer(color.id);
 			Piece[] capturedPieces = player.getCapturedPieces();
 			int capturedCount = player.getCapturedCount();
 
@@ -176,6 +183,9 @@ public class CLIDisplay implements Display {
 		// Show what was entered without clearing the screen
 		System.out.println(String.format("You entered: %s", in));
 
+		// Do NOT clear the screen here - that should only happen after both coordinates
+		// are entered and validated in gameLoop()
+
 		return new Coord(in.charAt(0 /* col */), in.charAt(1 /* row */));
 	}
 
@@ -187,11 +197,11 @@ public class CLIDisplay implements Display {
 	 */
 	@Override
 	public MenuResult mainMenu() {
-		// Clear screen before showing menu
+		// Clear screen before showing menu (one of the allowed places)
 		clearScreen();
 
 		// Display the main menu header and options
-		System.out.println("A Simple CLI Chess - Menu");
+		System.out.println("AHM CHESS GAME - MAIN MENU");
 		System.out.println("=========================");
 		System.out.println("1. Start a new game");
 		System.out.println("2. Exit");
@@ -213,10 +223,8 @@ public class CLIDisplay implements Display {
 			}
 		}
 
-		// Notify listeners of menu selection
-		for (MenuListener listener : menuListeners) {
-			listener.onMenuSelected(result);
-		}
+		// Don't notify listeners here - the run() method will do that
+		// This prevents double notification
 
 		if (result == MenuResult.EXIT) {
 			input.close();
@@ -235,19 +243,102 @@ public class CLIDisplay implements Display {
 
 	/**
 	 * Starts the CLI display event loop.
-	 * For CLI implementation, this simply sets a flag as the actual loop
-	 * is driven by the synchronous methods.
+	 * This method manages the main game loop and menu flow for CLI implementation.
 	 */
 	@Override
 	public void run() {
 		isRunning = true;
 
-		// Start with a clean screen - no welcome message needed here
-		// as the mainMenu method will show the menu header
-		clearScreen();
+		// Main application loop
+		while (isRunning) {
+			// Display the main menu and get user choice
+			MenuResult menuResult = mainMenu();
+			clearScreen(); // Clear screen before game start
 
-		// CLI is synchronous, so the actual "event loop" happens
-		// in the getCoord and mainMenu methods
+			// Notify all menu listeners
+			for (MenuListener listener : menuListeners) {
+				listener.onMenuSelected(menuResult);
+			}
+
+			// If user chose to exit, break the loop
+			if (menuResult == MenuResult.EXIT) {
+				isRunning = false;
+				break;
+			}
+
+			// If game is started, clear screen (one of the allowed places) and enter the game loop
+			if (menuResult == MenuResult.START) {
+				gameLoop();
+				// After the game loop ends, display the main menu again
+				// unless the application is exiting
+				if (isRunning) {
+					clearScreen(); // Clear screen before showing menu again
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handles the game loop for CLI display.
+	 * This keeps asking for moves until the game ends.
+	 */
+	private void gameLoop() {
+		boolean gameInProgress = true;
+
+		while (gameInProgress && isRunning) {
+			// Get moves from the player
+			Coord src, dst;
+			try {
+				src = getCoord("of piece to move");
+				if (src == null) {
+					// Check if user requested to exit (entered 'q')
+					if (isExitRequested()) {
+						showMessage("Returning to main menu...");
+						resetExitFlag();
+						gameInProgress = false;
+						break;
+					} else {
+						showGameEnd("Game ended forcefully.");
+						gameInProgress = false;
+						break;
+					}
+				}
+
+				dst = getCoord("of the square to move the piece to");
+				if (dst == null) {
+					// Check if user requested to exit (entered 'q')
+					if (isExitRequested()) {
+						showMessage("Returning to main menu...");
+						resetExitFlag();
+						gameInProgress = false;
+						break;
+					} else {
+						showGameEnd("Game ended forcefully.");
+						gameInProgress = false;
+						break;
+					}
+				}
+
+				// Only clear screen after we have BOTH valid coordinates
+				// This is one of the three allowed places to clear the screen
+				clearScreen();
+
+				// Notify all move listeners
+				for (MoveListener listener : moveListeners) {
+					listener.onMoveRequested(src, dst);
+				}
+			} catch (
+				    IllegalArgumentException
+				    | StringIndexOutOfBoundsException e
+				) {
+				// Show error without clearing screen to preserve board display
+				showError("Invalid parameters!");
+				showMessage(e.toString());
+
+				// We don't need to redisplay the board here
+				// The board should still be visible since we didn't clear the screen
+			}
+		}
 	}
 
 	/**
@@ -294,13 +385,29 @@ public class CLIDisplay implements Display {
 		System.out.println("ERROR: " + message);
 	}
 
+	// clearScreen is defined above
+
 	/**
-	 * Clears the console screen.
-	 * This is a private implementation detail of the CLI display.
+	 * Private implementation detail: Screen clearing is managed internally by the CLIDisplay
+	 * at specific points:
+	 * 1. Before showing the main menu
+	 * 2. Before starting a new game
+	 * 3. After reading the destination coordinate
 	 */
 	private void clearScreen() {
 		System.out.print("\033[H\033[2J");
 		System.out.flush(); // Ensure the clear command is sent immediately
+	}
+
+	/**
+	 * Signals to the display that the game has ended.
+	 * This is called by the Chess class to notify the display to exit the game loop.
+	 */
+	@Override
+	public void endGame() {
+		// This method is called when the game is over
+		// It signals that the current game loop should end
+		// The main loop will continue and return to the menu
 	}
 
 	/**
@@ -362,12 +469,13 @@ public class CLIDisplay implements Display {
 
 	/**
 	 * Shows the game end message.
+	 * This will clear the screen before showing the game end message.
 	 *
 	 * @param message the end game message
 	 */
 	@Override
 	public void showGameEnd(String message) {
-		// Game end can clear screen since it's a final state
+		// Clear screen before showing game end message
 		clearScreen();
 		System.out.println(
 		    "====================================================="

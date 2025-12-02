@@ -1,6 +1,5 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay;
 import bd.ac.miu.cse.b60.oop.ahm.chess.piece.*;
 import java.time.LocalTime;
 
@@ -13,7 +12,6 @@ import java.time.LocalTime;
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece
- * @see bd.ac.miu.cse.b60.oop.ahm.chess.Display
  */
 public class Game {
 
@@ -47,28 +45,6 @@ public class Game {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
 	 */
 	private Player currentPlayer;
-
-	/**
-	 * The display for the game.
-	 *
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Display
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay
-	 */
-	private Display display;
-
-	/**
-	 * Prints the captured pieces for each player.
-	 */
-	public void printCapturedPieces() {
-		display.printCapturedPieces(getPlayerArray());
-	}
-
-	/**
-	 * Prints the current state of the board.
-	 */
-	public void printBoard() {
-		display.printBoard(board);
-	}
 
 	/**
 	 * Performs castling.
@@ -140,22 +116,9 @@ public class Game {
 	 * Initializes a new game with a time limit.
 	 *
 	 * @param timeLimit The time limit for each player.
-	 *
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay
 	 */
 	public Game(LocalTime timeLimit) {
-		this(timeLimit, new CLIDisplay());
-	}
-
-	/**
-	 * Initializes a new game with a time limit.
-	 *
-	 * @param timeLimit The time limit for each player.
-	 * @param display	Display Manager Instance.
-	 */
-	public Game(LocalTime timeLimit, Display display) {
 		board = new Square[DEFAULT_BOARD_WIDTH][DEFAULT_BOARD_HEIGHT];
-		this.display = display;
 		// Initialize each Square object in the board array
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 			for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {

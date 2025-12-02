@@ -18,6 +18,9 @@ public abstract class Piece {
 	/** The formatted name of the piece, including its color tag. */
 	private String name;
 
+	/** Game Instance owning this piece */
+	protected final Game game;
+
 	/**
 	 * The color of the piece (white or black).
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Color
@@ -32,10 +35,12 @@ public abstract class Piece {
 	 *
 	 * @param name  the base name of the piece (e.g., "King", "Queen")
 	 * @param color the {@code Color} of the piece
+	 * @param game  the {@code Game} instance owning this piece
 	 */
-	protected Piece(String name, Color color) {
+	protected Piece(String name, Color color, Game game) {
 		this.color = color;
 		this.name = String.format("%s<%s>", name, color.tag);
+		this.game = game;
 	}
 
 	/**
@@ -81,23 +86,26 @@ public abstract class Piece {
 	 * @param sourceCol the column index of the source square
 	 * @param destRow   the row index of the destination square
 	 * @param destCol   the column index of the destination square
-	 * @param board     the chessboard as a 2D array of {@code Square} objects
 	 * @return {@code true} if the move is valid, {@code false} otherwise
 	 */
-	public abstract boolean isValidMove(int sourceRow, int sourceCol, int destRow, int destCol, Square[][] board);
+	public abstract boolean isValidMove(
+	    int sourceRow,
+	    int sourceCol,
+	    int destRow,
+	    int destCol
+	);
 
 	/**
 	 * Checks if a move from the source square to the destination square is valid for this piece.
 	 *
 	 * @param src       Source square coordinates.
 	 * @param dst       Destination square coordinates.
-	 * @param board     the chessboard as a 2D array of {@code Square} objects
 	 * @return {@code true} if the move is valid, {@code false} otherwise
 	 *
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
 	 */
-	public boolean isValidMove(Coord src, Coord dst, Square[][] board) {
-		return isValidMove(src.row, src.col, dst.row, dst.col, board);
+	public boolean isValidMove(Coord src, Coord dst) {
+		return isValidMove(src.row, src.col, dst.row, dst.col);
 	}
 }

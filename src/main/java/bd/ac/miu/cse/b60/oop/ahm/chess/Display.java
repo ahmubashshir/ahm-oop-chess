@@ -18,20 +18,18 @@ public interface Display {
 	/**
 	 * Prints the current state of the chessboard to the display device.
 	 *
-	 * @param board a 2D array of {@code Square} representing the chessboard.
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece
+	 * @param game the current game state
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
-	void printBoard(Square[][] board);
+	void updateBoard(final Game game);
 
 	/**
 	 * Prints the captured pieces for each player.
 	 *
-	 * @param players an array of {@code Player} objects representing the players in the game.
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece#getCaptured()
+	 * @param game the current game state
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
-	void printCapturedPieces(Player[] players);
+	void updateCapturedPieces(final Game game);
 
 	/**
 	 * Asks Player to enter coordinate for an action.
@@ -122,6 +120,16 @@ public interface Display {
 	default void resetExitFlag() {
 		// Default implementation does nothing
 	}
+
+	/**
+	 * Signals that the current game has ended.
+	 * This allows display implementations to clean up or reset their game loop state.
+	 */
+	default void endGame() {
+		// Default implementation does nothing
+	}
+
+	// No clearDisplay method - screen clearing is an implementation detail of CLIDisplay
 
 	/**
 	 * Registers a listener for piece move events.

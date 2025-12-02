@@ -36,6 +36,10 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		display.addMoveListener(this);
 	}
 
+	public void run() {
+		display.run();
+	}
+
 	/**
 	 * Entry point of the {@code Chess} game.
 	 *
@@ -48,14 +52,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		// Create and setup game controller
 		Chess chess = new Chess(display);
 
-		// Start display event loop
-		display.run();
-
-		// For CLI display, manually trigger the main menu
-		if (display instanceof CLIDisplay) {
-			MenuResult result = display.mainMenu();
-			chess.onMenuSelected(result);
-		}
+		chess.run();
 	}
 
 	/**
@@ -75,7 +72,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 				game.end();
 			}
 			display.showMessage("Thank you for playing");
-			System.exit(0);
+			System.exit(0); // Ensure application exits properly
 			break;
 		}
 		default:
@@ -97,32 +94,20 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		}
 
 		Player currentPlayer = game.getCurrentPlayer();
-		String playerColor = currentPlayer.getPlayerID() == 1
-		                     ? "Black"
-		                     : "White";
-
 		try {
 			// Attempt to make the move
 			MoveStatus moveStatus = game.move(source, destination);
 
-			// Display the move result and update the UI
+			// Display the move result
 			display.showMoveStatus(moveStatus);
 
 			if (moveStatus == MoveStatus.Ok) {
 				currentPlayer.pauseTimer();
 				game.setNumOfTurns(game.getCurrentPlayer(), 1);
 				game.switchPlayer();
-
-				// Update the display in sequence
-				game.printCapturedPieces();
-				game.printBoard();
-				updatePlayerDisplay();
-
-				// Check game state
-				checkGameState();
+				updateGameState();
 			}
 		} catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
-			// Show error without using clearScreen
 			display.showError("Invalid parameters!");
 			display.showMessage(e.toString());
 		}
@@ -134,7 +119,7 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 	private void startNewGame() {
 		// Start game
 		// Start a new game
-		game = new Game(timeLimit, display);
+		game = new Game(timeLimit);
 		game.initializePiecePositions();
 		game.setMaxNumOfTurns(10);
 
@@ -153,15 +138,9 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		// Set game in progress flag
 		gameInProgress = true;
 
-		// Show initial game state in a specific sequence
-		game.printCapturedPieces();
-		game.printBoard();
-		updatePlayerDisplay();
+		updateGameState();
 
-		// Start game loop for CLI display
-		if (display instanceof CLIDisplay) {
-			gameLoop();
-		}
+		// The game loop is now handled by the display implementation
 	}
 
 	/**
@@ -181,72 +160,25 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 	}
 
 	/**
-	 * Handles the game loop for CLI display
+	 * Updates the display with the current game state.
+	 * This should be called whenever the game state changes.
 	 */
-	private void gameLoop() {
-		while (gameInProgress) {
-			Player currentPlayer = game.getCurrentPlayer();
-
-			// Check game state first
-			if (checkGameState()) {
-				break; // Game is over
-			}
-
-			// Get moves from the player
-			Coord src, dst;
-			try {
-				// Display game state before asking for move
-				game.printCapturedPieces();
-				game.printBoard();
-				updatePlayerDisplay();
-
-				src = display.getCoord("of piece to move");
-				if (src == null) {
-					// Check if user requested to exit (entered 'q')
-					if (display.isExitRequested()) {
-						display.showMessage("Returning to main menu...");
-						game.end();
-						gameInProgress = false;
-						display.resetExitFlag();
-						display.mainMenu();
-						break;
-					} else {
-						display.showGameEnd("Game ended forcefully.");
-						game.end();
-						gameInProgress = false;
-						break;
-					}
-				}
-
-				dst = display.getCoord("of the square to move the piece to");
-				if (dst == null) {
-					// Check if user requested to exit (entered 'q')
-					if (display.isExitRequested()) {
-						display.showMessage("Returning to main menu...");
-						game.end();
-						gameInProgress = false;
-						display.resetExitFlag();
-						display.mainMenu();
-						break;
-					} else {
-						display.showGameEnd("Game ended forcefully.");
-						game.end();
-						gameInProgress = false;
-						break;
-					}
-				}
-
-				// Process the move directly for CLI
-				onMoveRequested(src, dst);
-			} catch (
-				    IllegalArgumentException
-				    | StringIndexOutOfBoundsException e
-				) {
-				// Show error without using clearScreen
-				display.showError("Invalid parameters!");
-				display.showMessage(e.toString());
-			}
+	public void updateGameState() {
+		if (!gameInProgress) {
+			return;
 		}
+
+		Player currentPlayer = game.getCurrentPlayer();
+
+		// Check game state
+		if (checkGameState()) {
+			return; // Game is over
+		}
+
+		// Display current game state
+		display.updateCapturedPieces(game);
+		display.updateBoard(game);
+		updatePlayerDisplay();
 	}
 
 	/**
@@ -263,25 +195,31 @@ public final class Chess implements Display.MenuListener, Display.MoveListener {
 		                     : "White";
 
 		if (game.isDraw()) {
+			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    "Both players have run out of turns, game ends in a draw"
 			);
 			game.end();
 			gameInProgress = false;
+			display.endGame();
 			return true;
 		} else if (game.isTimeFinished()) {
+			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    playerColor + " loses as they ran out of time."
 			);
 			game.end();
 			gameInProgress = false;
+			display.endGame();
 			return true;
 		} else if (!game.isKingAlive()) {
+			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    playerColor + " King is dead, they lose the game"
 			);
 			game.end();
 			gameInProgress = false;
+			display.endGame();
 			return true;
 		} else if (game.isCheck()) {
 			display.showCheckWarning();
