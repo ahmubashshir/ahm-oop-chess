@@ -1,13 +1,22 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-public class AppTest
-{
+import java.lang.IllegalArgumentException;
+import org.junit.jupiter.api.Test;
+
+public class AppTest {
+
 	@Test
-	void testApp()
-	{
-		assertTrue(true); // Replace with actual test logic
+	void testCoord() {
+		assertThrowsExactly(IllegalArgumentException.class, () ->
+		                    new Coord('1', '1')
+		                   );
+		assertThrowsExactly(IllegalArgumentException.class, () ->
+		                    new Coord('1', 'h')
+		                   );
+		assertDoesNotThrow(() -> new Coord('a', '1'));
+		assertDoesNotThrow(() -> new Coord('h', '8'));
 	}
 }

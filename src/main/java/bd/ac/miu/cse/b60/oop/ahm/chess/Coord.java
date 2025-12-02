@@ -36,8 +36,7 @@ public class Coord {
 	 */
 	public Coord(char col, char row) {
 		if (
-		    !((col <= 'h' && col >= 'a') ||
-		      (col <= 'H' && col >= 'A') ||
+		    !(((col <= 'h' && col >= 'a') || (col <= 'H' && col >= 'A')) &&
 		      (row <= '8' && row >= '1'))
 		) throw new IllegalArgumentException("Coordinate not valid!");
 		this.col = col - ((col >= 'A' && col <= 'H') ? 'A' : 'a');
