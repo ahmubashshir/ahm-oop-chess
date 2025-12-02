@@ -190,31 +190,31 @@ public class Game {
 	 */
 	public void initializePiecePositions() {
 		// Initialize pieces for the white player
-		board[0][0].setPiece(new Rook(Color.WHITE));
-		board[0][1].setPiece(new Knight(Color.WHITE));
-		board[0][2].setPiece(new Bishop(Color.WHITE));
-		board[0][3].setPiece(new Queen(Color.WHITE));
-		board[0][4].setPiece(new King(Color.WHITE));
-		board[0][5].setPiece(new Bishop(Color.WHITE));
-		board[0][6].setPiece(new Knight(Color.WHITE));
-		board[0][7].setPiece(new Rook(Color.WHITE));
+		board[0][0].setPiece(new Rook(Color.WHITE, this));
+		board[0][1].setPiece(new Knight(Color.WHITE, this));
+		board[0][2].setPiece(new Bishop(Color.WHITE, this));
+		board[0][3].setPiece(new Queen(Color.WHITE, this));
+		board[0][4].setPiece(new King(Color.WHITE, this));
+		board[0][5].setPiece(new Bishop(Color.WHITE, this));
+		board[0][6].setPiece(new Knight(Color.WHITE, this));
+		board[0][7].setPiece(new Rook(Color.WHITE, this));
 
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
-			board[1][i].setPiece(new Pawn(Color.WHITE));
+			board[1][i].setPiece(new Pawn(Color.WHITE, this));
 		}
 
 		// Initialize pieces for the black player
-		board[7][0].setPiece(new Rook(Color.BLACK));
-		board[7][1].setPiece(new Knight(Color.BLACK));
-		board[7][2].setPiece(new Bishop(Color.BLACK));
-		board[7][3].setPiece(new Queen(Color.BLACK));
-		board[7][4].setPiece(new King(Color.BLACK));
-		board[7][5].setPiece(new Bishop(Color.BLACK));
-		board[7][6].setPiece(new Knight(Color.BLACK));
-		board[7][7].setPiece(new Rook(Color.BLACK));
+		board[7][0].setPiece(new Rook(Color.BLACK, this));
+		board[7][1].setPiece(new Knight(Color.BLACK, this));
+		board[7][2].setPiece(new Bishop(Color.BLACK, this));
+		board[7][3].setPiece(new Queen(Color.BLACK, this));
+		board[7][4].setPiece(new King(Color.BLACK, this));
+		board[7][5].setPiece(new Bishop(Color.BLACK, this));
+		board[7][6].setPiece(new Knight(Color.BLACK, this));
+		board[7][7].setPiece(new Rook(Color.BLACK, this));
 
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
-			board[6][i].setPiece(new Pawn(Color.BLACK));
+			board[6][i].setPiece(new Pawn(Color.BLACK, this));
 		}
 
 		// Initialize the rest of the board with empty squares
@@ -290,7 +290,7 @@ public class Game {
 		) return MoveStatus.PlayerError;
 
 		// Check if the move is valid for the specific piece
-		if (pieceToMove.isValidMove(src, dst, board)) {
+		if (pieceToMove.isValidMove(src, dst)) {
 			// Check if the destination square is empty or has an opponent's piece
 			if (
 			    destSquare.getPiece() == null ||
@@ -404,8 +404,7 @@ public class Game {
 						        row,
 						        col,
 						        currentKingRow,
-						        currentKingCol,
-						        board
+						        currentKingCol
 						    )
 						) {
 							return true;

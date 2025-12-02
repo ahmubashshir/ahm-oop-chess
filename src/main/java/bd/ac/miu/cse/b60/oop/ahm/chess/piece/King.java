@@ -1,6 +1,7 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess.piece;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 
@@ -29,10 +30,12 @@ public class King extends Piece {
 	 * Constructs a new {@code King} with the specified {@code Color}.
 	 *
 	 * @param color The {@code Color} of the king ({@code Color.WHITE} or {@code Color.BLACK})
+	 * @param game The {@code Game} instance associated with the king
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Color
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
-	public King(Color color) {
-		super("King", color);
+	public King(Color color, Game game) {
+		super("King", color, game);
 		this.hasMoved = false;
 	}
 
@@ -51,32 +54,52 @@ public class King extends Piece {
 	 * @param sourceCol The column index of the source square
 	 * @param destRow   The row index of the destination square
 	 * @param destCol   The column index of the destination square
-	 * @param board     The chessboard as a 2D array of {@code Square}s
 	 * @return {@code true} if the move is valid, {@code false} otherwise
 	 *
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Rook#hasMoved()
 	 */
-	public boolean isValidMove(int sourceRow, int sourceCol, int destRow, int destCol, Square[][] board) {
+	public boolean isValidMove(
+	    int sourceRow,
+	    int sourceCol,
+	    int destRow,
+	    int destCol
+	) {
+		final Square[][] board = this.game.getBoard();
 		// Check one-square move
-		boolean isOneSquareMove = (Math.abs(destRow - sourceRow) <= 1) && (Math.abs(destCol - sourceCol) <= 1);
+		boolean isOneSquareMove =
+		    (Math.abs(destRow - sourceRow) <= 1) &&
+		    (Math.abs(destCol - sourceCol) <= 1);
 		// Check bounds
-		boolean isWithinBounds = (destRow >= 0) && (destRow < board.length) && (destCol >= 0) && (destCol < board[0].length);
+		boolean isWithinBounds =
+		    (destRow >= 0) &&
+		    (destRow < board.length) &&
+		    (destCol >= 0) &&
+		    (destCol < board[0].length);
 
 		if (isWithinBounds) {
 			if (isOneSquareMove) {
 				this.hasMoved = true;
 				return true;
-			} else if (!hasMoved && (Math.abs(destCol - sourceCol) == 2) && (destRow == sourceRow)) {
+			} else if (
+			    !hasMoved &&
+			    (Math.abs(destCol - sourceCol) == 2) &&
+			    (destRow == sourceRow)
+			) {
 				int rookCol = (destCol > sourceCol) ? board[0].length - 1 : 0;
 				Square rookSquare = board[destRow][rookCol];
 
-				if ((rookSquare.getPiece() instanceof Rook) && (!((Rook) rookSquare.getPiece()).hasMoved())) {
+				if (
+				    (rookSquare.getPiece() instanceof Rook) &&
+				    (!((Rook) rookSquare.getPiece()).hasMoved())
+				) {
 					int colIncrement = (destCol > sourceCol) ? 1 : -1;
 
-					for (int col = sourceCol + colIncrement; col != destCol; col += colIncrement)
-						if (board[destRow][col].getPiece() != null)
-							return false;
+					for (
+					    int col = sourceCol + colIncrement;
+					    col != destCol;
+					    col += colIncrement
+					) if (board[destRow][col].getPiece() != null) return false;
 
 					this.hasMoved = true;
 					return true;

@@ -1,8 +1,9 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess.piece;
 
+import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
+import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
-import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 
 /**
  * The {@code Queen} class represents a queen chess piece that extends the
@@ -14,107 +15,111 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
  * clear path to the destination.
  *
  */
-public class Queen extends Piece
-{
+public class Queen extends Piece {
 
 	/**
 	 * Constructs a new {@code Queen} object with the specified color.
 	 *
 	 * @param color  Sets {@code Color} of the Piece.
+	 * @param game   Sets {@code Game} of the Piece.
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Color
+	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
-	public Queen(Color color)
-	{
-		super("Queen", color);
+	public Queen(Color color, Game game) {
+		super("Queen", color, game);
 	}
 
 	/**
-	* Checks if the move for the queen from the source position to the destination
-	* position is valid.
-	* The move must be either horizontal, vertical, or diagonal, and there should
-	* be a clear path to the destination.
-	*
-	* @param sourceRow The row index of the source position.
-	* @param sourceCol The column index of the source position.
-	* @param destRow   The row index of the destination position.
-	* @param destCol   The column index of the destination position.
-	* @param board     The chessboard represented as a 2D array of squares.
-	* @return {@code true} if the move is valid, {@code false} otherwise.
-	*/
-	public boolean isValidMove(int sourceRow, int sourceCol, int destRow, int destCol, Square[][] board)
-	{
+	 * Checks if the move for the queen from the source position to the destination
+	 * position is valid.
+	 * The move must be either horizontal, vertical, or diagonal, and there should
+	 * be a clear path to the destination.
+	 *
+	 * @param sourceRow The row index of the source position.
+	 * @param sourceCol The column index of the source position.
+	 * @param destRow   The row index of the destination position.
+	 * @param destCol   The column index of the destination position.
+	 * @return {@code true} if the move is valid, {@code false} otherwise.
+	 */
+	public boolean isValidMove(
+	    int sourceRow,
+	    int sourceCol,
+	    int destRow,
+	    int destCol
+	) {
+		final Square[][] board = this.game.getBoard();
 		// Check if the move is either horizontal, vertical, or diagonal
-		boolean isHorizontalMove = ((sourceRow == destRow) && (sourceCol != destCol));
-		boolean isVerticalMove = ((sourceRow != destRow) && (sourceCol == destCol));
-		boolean isDiagonalMove = (Math.abs(destRow - sourceRow) == Math.abs(destCol - sourceCol));
+		boolean isHorizontalMove = ((sourceRow == destRow) &&
+		                            (sourceCol != destCol));
+		boolean isVerticalMove = ((sourceRow != destRow) &&
+		                          (sourceCol == destCol));
+		boolean isDiagonalMove = (Math.abs(destRow - sourceRow) ==
+		                          Math.abs(destCol - sourceCol));
 
 		// Check if the destination is within the bounds of the board
-		boolean isWithinBounds = ((destRow >= 0) && (destRow < board.length) && (destCol >= 0)
-		                          && (destCol < board[0].length));
+		boolean isWithinBounds = ((destRow >= 0) &&
+		                          (destRow < board.length) &&
+		                          (destCol >= 0) &&
+		                          (destCol < board[0].length));
 
-		if (isWithinBounds && (isHorizontalMove || isVerticalMove || isDiagonalMove))
-			{
+		if (
+		    isWithinBounds &&
+		    (isHorizontalMove || isVerticalMove || isDiagonalMove)
+		) {
+			// Check for a clear path in the horizontal movement
+			if (isHorizontalMove) {
+				int minCol = Math.min(sourceCol, destCol);
+				int maxCol = Math.max(sourceCol, destCol);
 
-				// Check for a clear path in the horizontal movement
-				if (isHorizontalMove)
-					{
-						int minCol = Math.min(sourceCol, destCol);
-						int maxCol = Math.max(sourceCol, destCol);
-
-						for (int col = minCol + 1; col < maxCol; col++)
-							{
-								// Check if piece in path, if so return false
-								if (board[sourceRow][col].getPiece() != null)
-									{
-										return false;
-									}
-							}
+				for (int col = minCol + 1; col < maxCol; col++) {
+					// Check if piece in path, if so return false
+					if (board[sourceRow][col].getPiece() != null) {
+						return false;
 					}
-
-				// Check for a clear path in the vertical movement
-				if (isVerticalMove)
-					{
-						int minRow = Math.min(sourceRow, destRow);
-						int maxRow = Math.max(sourceRow, destRow);
-
-						for (int row = minRow + 1; row < maxRow; row++)
-							{
-								// Check if piece in path, if so return false
-								if (board[row][sourceCol].getPiece() != null)
-									{
-										return false;
-									}
-							}
-					}
-
-				// Check for a clear path in the diagonal movement
-				if (isDiagonalMove)
-					{
-						if (Math.abs(destRow - sourceRow) == Math.abs(destCol - sourceCol))
-							{
-								int rowIncrement = (destRow > sourceRow) ? 1 : -1;
-								int colIncrement = (destCol > sourceCol) ? 1 : -1;
-
-								int currentRow = sourceRow + rowIncrement;
-								int currentCol = sourceCol + colIncrement;
-
-								// Corrected loop condition
-								while (currentRow != destRow || currentCol != destCol)
-									{
-										// Check if piece in path, if so return false
-										if (board[currentRow][currentCol].getPiece() != null)
-											{
-												return false;
-											}
-										// Increment loop parameters to continue index
-										currentRow += rowIncrement;
-										currentCol += colIncrement;
-									}
-							}
-					}
-
-				// Path is clear
-				return true;
+				}
 			}
+
+			// Check for a clear path in the vertical movement
+			if (isVerticalMove) {
+				int minRow = Math.min(sourceRow, destRow);
+				int maxRow = Math.max(sourceRow, destRow);
+
+				for (int row = minRow + 1; row < maxRow; row++) {
+					// Check if piece in path, if so return false
+					if (board[row][sourceCol].getPiece() != null) {
+						return false;
+					}
+				}
+			}
+
+			// Check for a clear path in the diagonal movement
+			if (isDiagonalMove) {
+				if (
+				    Math.abs(destRow - sourceRow) ==
+				    Math.abs(destCol - sourceCol)
+				) {
+					int rowIncrement = (destRow > sourceRow) ? 1 : -1;
+					int colIncrement = (destCol > sourceCol) ? 1 : -1;
+
+					int currentRow = sourceRow + rowIncrement;
+					int currentCol = sourceCol + colIncrement;
+
+					// Corrected loop condition
+					while (currentRow != destRow || currentCol != destCol) {
+						// Check if piece in path, if so return false
+						if (board[currentRow][currentCol].getPiece() != null) {
+							return false;
+						}
+						// Increment loop parameters to continue index
+						currentRow += rowIncrement;
+						currentCol += colIncrement;
+					}
+				}
+			}
+
+			// Path is clear
+			return true;
+		}
 
 		// Invalid move
 		return false;
