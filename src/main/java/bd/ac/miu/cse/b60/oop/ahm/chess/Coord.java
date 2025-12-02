@@ -5,6 +5,7 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
  * Each coordinate consists of a {@code row} and a {@code col} value.
  */
 public class Coord {
+
 	/** The column of the coordinate, in the range {@code 0-7}. */
 	public final int col;
 
@@ -19,8 +20,9 @@ public class Coord {
 	 * @throws IllegalArgumentException if {@code col} or {@code row} is outside the valid range.
 	 */
 	public Coord(int col, int row) {
-		if (col > 7 || row > 7 || col < 0 || row < 0)
-			throw new IllegalArgumentException("Coordinate not valid!");
+		if (
+		    col > 7 || row > 7 || col < 0 || row < 0
+		) throw new IllegalArgumentException("Coordinate not valid!");
 		this.col = col;
 		this.row = row;
 	}
@@ -33,9 +35,12 @@ public class Coord {
 	 * @throws IllegalArgumentException if {@code col} or {@code row} is outside the valid range.
 	 */
 	public Coord(char col, char row) {
-		if(col > 'h' || col < 'a' || row > '8' || row < '1')
-			throw new IllegalArgumentException("Coordinate not valid!");
-		this.col = col - 'a';
+		if (
+		    !((col <= 'h' && col >= 'a') ||
+		      (col <= 'H' && col >= 'A') ||
+		      (row <= '8' && row >= '1'))
+		) throw new IllegalArgumentException("Coordinate not valid!");
+		this.col = col - ((col >= 'A' && col <= 'H') ? 'A' : 'a');
 		this.row = row - '1';
 	}
 }
