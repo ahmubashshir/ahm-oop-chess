@@ -7,6 +7,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.State;
 import bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay;
+import bd.ac.miu.cse.b60.oop.ahm.chess.display.SwingDisplay;
 import java.time.LocalTime;
 
 /**
@@ -47,14 +48,28 @@ public final class Chess implements Display.StateListener, Display.MoveListener 
 
 	/**
 	 * Entry point of the {@code Chess} game.
-	 *
-	 * @param args command-line arguments (not used)
+	 * Usage: java ... Chess --cli   (for CLI)
+	 *        java ... Chess --swing (for Swing, default)
+	 * @param args command-line arguments
 	 */
-	public static final void main(String[] args) {
-		// Create display implementation
-		Display display = new CLIDisplay();
-
-		// Create and setup game controller
+	public static void main(String[] args) {
+		Display display;
+		boolean useSwing = true;
+		for (String arg : args) {
+			if (arg.equalsIgnoreCase("--cli")) {
+				useSwing = false;
+				break;
+			}
+			if (arg.equalsIgnoreCase("--swing")) {
+				useSwing = true;
+				break;
+			}
+		}
+		if (useSwing) {
+			display = new SwingDisplay();
+		} else {
+			display = new CLIDisplay();
+		}
 		Chess chess = new Chess(display);
 		chess.run();
 	}
