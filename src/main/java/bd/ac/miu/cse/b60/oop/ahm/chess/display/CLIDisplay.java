@@ -150,7 +150,7 @@ public class CLIDisplay implements Display {
 		clearScreen();
 
 		// Display the main menu header and options
-		System.out.println("AHM CHESS GAME - MAIN MENU");
+		System.out.println("OOPChess: Command Line UI");
 		System.out.println("=========================");
 		System.out.println("1. Start a new game");
 		System.out.println("2. Exit");

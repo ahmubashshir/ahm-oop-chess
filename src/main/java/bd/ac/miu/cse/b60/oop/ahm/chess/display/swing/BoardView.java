@@ -7,21 +7,32 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 /**
- * A reusable Swing component that renders the chess board, captured pieces,
- * player info, and a status line. Implemented as a {@code JPanel} for easy embedding
- * in a larger window or standalone use in a {@code JFrame}.
+ * BoardView is a reusable Swing component for rendering and interacting with a chess board
+ * in a graphical chess application. It displays the board, captured pieces, player info,
+ * and a status line, and is designed to be embedded in a larger window or used standalone.
+ *
+ * <b>Integration:</b>
+ * BoardView is typically managed by {@link SwingDisplay}, which coordinates game state and user interaction.
+ * Moves are communicated via registered {@link Display.MoveListener}s, and game-end requests are handled
+ * through a callback provided at construction.
+ *
+ * <b>Public API Overview:</b>
+ * <ul>
+ *   <li>{@code addMoveListener(Display.MoveListener)}: Register listeners for move events.</li>
+ *   <li>{@code updateBoard(Game)}: Update the board display from a {@link Game} instance.</li>
+ *   <li>{@code updateCapturedPieces(Game)}: Update captured pieces display.</li>
+ *   <li>{@code showMessage(String)}, {@code showError(String)}, {@code showPlayerInfo(String, LocalTime)}, {@code showGameEnd(String)}, {@code showCheckWarning()}: Display status and feedback to the user.</li>
+ * </ul>
  *
  * <b>Usage Example:</b>
  * <pre>
  *   BoardView boardView = new BoardView(() -> {
- *       // Callback when game end is requested
+ *       // Handle game end request
  *   });
  *   boardView.addMoveListener((src, dst) -> {
  *       // Handle move from src to dst
@@ -29,18 +40,16 @@ import javax.swing.border.LineBorder;
  *   frame.getContentPane().add(boardView, BorderLayout.CENTER);
  * </pre>
  *
- * <b>Responsibilities:</b>
- * - Render an 8x8 board of clickable cells.
- * - Track and highlight pending source selection; notify registered {@link Display.MoveListener}s when a destination is chosen.
- * - Display captured pieces for both players and basic player/time info.
- * - Provide convenience methods for updating from a {@link Game} instance.
- *
  * <b>Event-Driven Design:</b>
  * - User interactions (cell clicks) trigger listener notifications for moves.
- * - Game end requests are handled via a callback.
+ * - Game end requests are handled via the provided callback.
  *
  * <b>Threading:</b>
- * - Public update methods use {@code SwingUtilities.invokeLater} when necessary, so callers may invoke them from non-EDT threads.
+ * - All public update methods are safe to call from non-EDT threads; UI updates are dispatched via {@code SwingUtilities.invokeLater}.
+ *
+ * <b>Extension Notes:</b>
+ * - BoardView can be extended to customize board appearance, add new UI elements, or modify interaction logic.
+ * - For integration, ensure listeners and callbacks are properly registered to handle game logic.
  */
 public class BoardView extends JPanel {
 
@@ -56,9 +65,8 @@ public class BoardView extends JPanel {
 	    "Player: N/A    Time: 00:00:00"
 	);
 
-	private final List<Display.MoveListener> moveListeners =
-	    new CopyOnWriteArrayList<>();
 	private final Runnable gameEndRequested;
+	private final Display.MoveListener moveListener;
 
 	/**
 	 * Pending selected source coordinate (null when none selected).
@@ -69,12 +77,13 @@ public class BoardView extends JPanel {
 	/**
 	 * Constructs the BoardView and builds its internal Swing components.
 	 */
-	public BoardView(Runnable callback) {
+	public BoardView(Display.MoveListener listener, Runnable callback) {
 		setLayout(new BorderLayout(8, 8));
 		buildBoardArea();
 		buildSidePanels();
 		buildStatusArea();
 		gameEndRequested = callback;
+		moveListener = listener;
 	}
 
 	private void buildBoardArea() {
@@ -148,25 +157,6 @@ public class BoardView extends JPanel {
 		statusPanel.add(endGameBtn, BorderLayout.EAST);
 	}
 
-	/**
-	 * Register a {@link Display.MoveListener} that will be notified when the user
-	 * selects a source then a destination on the board.
-	 *
-	 * @param listener listener to register
-	 */
-	public void addMoveListener(Display.MoveListener listener) {
-		if (listener != null) moveListeners.add(listener);
-	}
-
-	/**
-	 * Remove a previously registered move listener.
-	 *
-	 * @param listener listener to remove
-	 */
-	public void removeMoveListener(Display.MoveListener listener) {
-		moveListeners.remove(listener);
-	}
-
 	private void onCellClicked(int row, int col) {
 		Coord clicked = new Coord(col, row);
 		if (pendingSource == null) {
@@ -185,14 +175,7 @@ public class BoardView extends JPanel {
 			Coord dst = clicked;
 			pendingSource = null;
 			// Notify listeners on EDT to avoid threading surprises
-			for (Display.MoveListener l : moveListeners) {
-				try {
-					l.onMoveRequested(src, dst);
-				} catch (Throwable ignored) {
-					// Listener exceptions must not break the UI; report a status instead
-					setStatus("Listener error while requesting move");
-				}
-			}
+			moveListener.onMoveRequested(src, dst);
 			setStatus(
 			    String.format(
 			        "Move requested: %c%d -> %c%d",

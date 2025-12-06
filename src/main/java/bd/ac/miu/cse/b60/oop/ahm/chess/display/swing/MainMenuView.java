@@ -1,32 +1,44 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess.display.swing;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.Display;
 import java.awt.*;
 import javax.swing.*;
 
 /**
- * Embedded main menu panel for the chess application.
+ * MainMenuView is a reusable Swing {@code JPanel} that provides the main menu interface
+ * for the chess application, allowing users to start a new game or exit.
  *
- * <b>Responsibilities:</b>
+ * <b>Overview:</b>
  * <ul>
- *   <li>Presents Start / Exit options to the user.</li>
- *   <li>Notifies registered {@link Display.StateListener}s and invokes callbacks when an option is selected.</li>
- *   <li>Intended to be placed inside the application's main window, not as a modal dialog.</li>
+ *   <li>Displays "Start" and "Exit" options in a simple, embeddable panel.</li>
+ *   <li>Integrates with {@link SwingDisplay} or any JFrame-based chess UI.</li>
+ *   <li>Uses callbacks to notify the application when an option is selected.</li>
+ * </ul>
+ *
+ * <b>Integration:</b>
+ * <ul>
+ *   <li>Designed to be placed inside the main application window (not as a modal dialog).</li>
+ *   <li>Works seamlessly with event-driven architectures; callbacks allow flexible control flow.</li>
+ * </ul>
+ *
+ * <b>Public API:</b>
+ * <ul>
+ *   <li>{@link MainMenuView#MainMenuView(Runnable, Runnable)}: Constructor with callbacks for Start and Exit.</li>
+ *   <li>{@link MainMenuView#MainMenuView()}: Default constructor (no callbacks).</li>
  * </ul>
  *
  * <b>Usage Example:</b>
  * <pre>
  *   MainMenuView menu = new MainMenuView(
- *       () -> showBoardView(),      // onStart callback
- *       () -> exitApplication()     // onExit callback
+ *       () -> showBoardView(),      // Called when Start is selected
+ *       () -> exitApplication()     // Called when Exit is selected
  *   );
  *   frame.getContentPane().add(menu, BorderLayout.CENTER);
  * </pre>
  *
- * <b>Event Flow:</b>
+ * <b>Extension Notes:</b>
  * <ul>
- *   <li>When "Start" is clicked, the onStart callback is invoked.</li>
- *   <li>When "Exit" is clicked, the onExit callback is invoked.</li>
+ *   <li>Override or extend this panel to add more menu options or customize appearance.</li>
+ *   <li>Callbacks can be chained or replaced to integrate with custom application logic.</li>
  * </ul>
  */
 public class MainMenuView extends JPanel {

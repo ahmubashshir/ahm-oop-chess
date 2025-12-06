@@ -71,16 +71,11 @@ public class SwingDisplay implements Display {
 	 * Build the main GUI components on the Swing EDT.
 	 */
 	private void buildUI() {
-		frame = new JFrame("AHM Chess - Swing Display");
+		frame = new JFrame("OOPChess: Swing UI");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLayout(new BorderLayout(6, 6));
 
-		boardView = new BoardView(() -> {
-			notifyMenuListeners(State.END);
-			showMainMenu();
-		});
-		boardView.addMoveListener(this::notifyMoveListeners);
-
+		boardView = new BoardView(this::notifyMoveListeners, this::endGame);
 		menuView = new MainMenuView(this::showBoard, this::exitApp);
 		frame.add(menuView, BorderLayout.CENTER);
 
@@ -237,11 +232,7 @@ public class SwingDisplay implements Display {
 
 		if (frame == null) buildUI();
 		if (boardView == null) {
-			boardView = new BoardView(() -> {
-				notifyMenuListeners(State.END);
-				showMainMenu();
-			});
-			boardView.addMoveListener(this::notifyMoveListeners);
+			boardView = new BoardView(this::notifyMoveListeners, this::endGame);
 		}
 		SwingUtilities.invokeLater(() -> {
 			frame.getContentPane().removeAll();
@@ -249,6 +240,11 @@ public class SwingDisplay implements Display {
 			frame.revalidate();
 			frame.repaint();
 		});
+	}
+
+	private void endGame() {
+		notifyMenuListeners(State.END);
+		showMainMenu();
 	}
 
 	/**
