@@ -19,12 +19,23 @@ import javax.swing.*;
  * AWT/Swing based implementation of {@link Display}.
  *
  * This class provides an event-driven GUI using Swing. It renders the board,
- * captured pieces, player info and provides controls for starting/exiting the game.
+ * captured pieces, player info, and provides controls for starting/exiting the game.
  *
- * Note: This implementation is event-driven. Methods like {@link #getCoord(String)}
- * and {@link #showMainMenu()} are implemented to behave in a GUI-appropriate manner:
- * - {@link #showMainMenu()} shows a blocking dialog to select Start/Exit.
- * - {@link #getCoord(String)} returns {@code null} (coordinate acquisition is done via UI clicks).
+ * <b>Usage:</b>
+ * <pre>
+ *     Display display = new SwingDisplay();
+ *     display.run();
+ * </pre>
+ *
+ * <b>Architecture:</b>
+ * - Event-driven: User actions (moves, menu selections) are handled via listeners.
+ * - UI components: Uses {@link BoardView} for board display and {@link MainMenuView} for menu.
+ * - Threading: All UI updates are performed on the Swing Event Dispatch Thread (EDT).
+ *
+ * <b>API Notes:</b>
+ * - {@link #showMainMenu()} displays a blocking dialog for Start/Exit.
+ * - {@link #getCoord(String)} always returns {@code null}; coordinates are acquired via UI clicks.
+ * - Use {@link #addMoveListener(MoveListener)} and {@link #addMenuListener(StateListener)} to handle user actions.
  */
 public class SwingDisplay implements Display {
 
@@ -41,7 +52,7 @@ public class SwingDisplay implements Display {
 	private volatile boolean exitRequested = false;
 
 	public SwingDisplay() {
-		// Lazily create UI on run()/EDT
+		// UI is created lazily on run()/EDT
 	}
 
 	private void notifyMenuListeners(State result) {
@@ -64,17 +75,13 @@ public class SwingDisplay implements Display {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLayout(new BorderLayout(6, 6));
 
-		// Create BoardView and embedded MainMenuView. Menu is shown first.
 		boardView = new BoardView(() -> {
 			notifyMenuListeners(State.END);
 			showMainMenu();
 		});
-		// forward board move events to registered display listeners
 		boardView.addMoveListener(this::notifyMoveListeners);
 
-		// Create menu view with callbacks to swap to board or exit
 		menuView = new MainMenuView(this::showBoard, this::exitApp);
-		// Show menu initially
 		frame.add(menuView, BorderLayout.CENTER);
 
 		// Window closing should notify menu listeners with EXIT
@@ -93,8 +100,7 @@ public class SwingDisplay implements Display {
 		frame.setVisible(true);
 	}
 
-	// User interactions on the board are handled by BoardView. No per-cell logic is required here.
-	// BoardView forwards move events to this display via the registered listeners.
+	// User interactions on the board are handled by BoardView.
 
 	@Override
 	public void updateBoard(final Game game) {
@@ -103,7 +109,7 @@ public class SwingDisplay implements Display {
 		}
 	}
 
-	// Symbol mapping is implemented inside BoardView. Left here only for compatibility comment.
+	// Symbol mapping is implemented inside BoardView.
 
 	@Override
 	public void updateCapturedPieces(final Game game) {
@@ -230,7 +236,6 @@ public class SwingDisplay implements Display {
 		notifyMenuListeners(State.START);
 
 		if (frame == null) buildUI();
-		// Ensure boardView exists and forwards its move events to registered listeners.
 		if (boardView == null) {
 			boardView = new BoardView(() -> {
 				notifyMenuListeners(State.END);

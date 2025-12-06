@@ -7,21 +7,27 @@ import javax.swing.*;
 /**
  * Embedded main menu panel for the chess application.
  *
- * <p>
- * This {@code JPanel} presents Start / Exit options and notifies registered
- * {@link Display.StateListener}s when the user makes a selection. It is intended
- * to be placed inside the application's main window rather than shown as a
- * separate modal dialog.
- * </p>
+ * <b>Responsibilities:</b>
+ * <ul>
+ *   <li>Presents Start / Exit options to the user.</li>
+ *   <li>Notifies registered {@link Display.StateListener}s and invokes callbacks when an option is selected.</li>
+ *   <li>Intended to be placed inside the application's main window, not as a modal dialog.</li>
+ * </ul>
  *
- * Example usage:
+ * <b>Usage Example:</b>
  * <pre>
- *   MainMenuView menu = new MainMenuView(menuListeners,
+ *   MainMenuView menu = new MainMenuView(
  *       () -> showBoardView(),      // onStart callback
  *       () -> exitApplication()     // onExit callback
  *   );
  *   frame.getContentPane().add(menu, BorderLayout.CENTER);
  * </pre>
+ *
+ * <b>Event Flow:</b>
+ * <ul>
+ *   <li>When "Start" is clicked, the onStart callback is invoked.</li>
+ *   <li>When "Exit" is clicked, the onExit callback is invoked.</li>
+ * </ul>
  */
 public class MainMenuView extends JPanel {
 
@@ -31,8 +37,8 @@ public class MainMenuView extends JPanel {
 	/**
 	 * Create an embedded main menu panel.
 	 *
-	 * @param onStart optional callback invoked after listeners are notified when Start is chosen
-	 * @param onExit optional callback invoked after listeners are notified when Exit is chosen
+	 * @param onStart callback invoked when Start is chosen
+	 * @param onExit callback invoked when Exit is chosen
 	 */
 	public MainMenuView(Runnable onStart, Runnable onExit) {
 		this.onStart = onStart;
@@ -41,7 +47,7 @@ public class MainMenuView extends JPanel {
 	}
 
 	/**
-	 * Default constructor for embedding without external listeners or callbacks.
+	 * Default constructor for embedding without external callbacks.
 	 */
 	public MainMenuView() {
 		this(null, null);

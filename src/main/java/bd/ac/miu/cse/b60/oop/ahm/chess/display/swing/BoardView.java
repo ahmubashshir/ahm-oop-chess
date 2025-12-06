@@ -15,18 +15,32 @@ import javax.swing.border.LineBorder;
 
 /**
  * A reusable Swing component that renders the chess board, captured pieces,
- * player info and a status line. It is intentionally implemented as a JPanel
- * so it can be embedded in a larger window or used standalone inside a JFrame.
+ * player info, and a status line. Implemented as a {@code JPanel} for easy embedding
+ * in a larger window or standalone use in a {@code JFrame}.
  *
- * Responsibilities:
+ * <b>Usage Example:</b>
+ * <pre>
+ *   BoardView boardView = new BoardView(() -> {
+ *       // Callback when game end is requested
+ *   });
+ *   boardView.addMoveListener((src, dst) -> {
+ *       // Handle move from src to dst
+ *   });
+ *   frame.getContentPane().add(boardView, BorderLayout.CENTER);
+ * </pre>
+ *
+ * <b>Responsibilities:</b>
  * - Render an 8x8 board of clickable cells.
- * - Maintain and display a pending source selection and notify registered
- *   {@link Display.MoveListener}s when a destination is chosen.
- * - Render captured pieces for both players and basic player/time info.
+ * - Track and highlight pending source selection; notify registered {@link Display.MoveListener}s when a destination is chosen.
+ * - Display captured pieces for both players and basic player/time info.
  * - Provide convenience methods for updating from a {@link Game} instance.
  *
- * Threading: public update methods use SwingUtilities.invokeLater when necessary
- * so the caller may call them from non-EDT threads.
+ * <b>Event-Driven Design:</b>
+ * - User interactions (cell clicks) trigger listener notifications for moves.
+ * - Game end requests are handled via a callback.
+ *
+ * <b>Threading:</b>
+ * - Public update methods use {@code SwingUtilities.invokeLater} when necessary, so callers may invoke them from non-EDT threads.
  */
 public class BoardView extends JPanel {
 
@@ -79,7 +93,6 @@ public class BoardView extends JPanel {
 				btn.setFocusable(false);
 				btn.setFont(cellFont);
 				btn.setMargin(new Insets(2, 2, 2, 2));
-				// color the board squares
 				boolean isLight = ((r + c) % 2 == 0);
 				btn.setBackground(isLight ? Color.LIGHT_GRAY : Color.DARK_GRAY);
 				btn.setOpaque(true);
@@ -95,7 +108,6 @@ public class BoardView extends JPanel {
 	}
 
 	private void buildSidePanels() {
-		// Place captured panels horizontally and move them to top/bottom of the layout.
 		whiteCapturedPanel.setLayout(
 		    new BoxLayout(whiteCapturedPanel, BoxLayout.X_AXIS)
 		);
@@ -110,13 +122,10 @@ public class BoardView extends JPanel {
 		    BorderFactory.createTitledBorder("Black Captured")
 		);
 
-		// bottomContainer will hold blackCapturedPanel above the statusPanel so they
-		// don't overlap the board; statusPanel is a dedicated container for status/player info.
 		bottomContainer.setLayout(new BorderLayout(4, 4));
 		bottomContainer.add(blackCapturedPanel, BorderLayout.NORTH);
 		bottomContainer.add(statusPanel, BorderLayout.SOUTH);
 
-		// Move captured panels from the sides to top and bottom
 		add(whiteCapturedPanel, BorderLayout.NORTH);
 		add(bottomContainer, BorderLayout.SOUTH);
 	}
@@ -124,18 +133,15 @@ public class BoardView extends JPanel {
 	private void buildStatusArea() {
 		playerInfoLabel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 		statusLabel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
-		// Limit status panel height so it doesn't consume too much space
 		statusPanel.setPreferredSize(new Dimension(0, 36));
 		statusPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		statusPanel.add(playerInfoLabel, BorderLayout.WEST);
 		statusPanel.add(statusLabel, BorderLayout.CENTER);
 
-		// Add an End Current Game button to the right of the status area
 		JButton endGameBtn = new JButton("End Current Game");
 		endGameBtn.setFocusable(false);
 		endGameBtn.setMargin(new Insets(4, 8, 4, 8));
 		endGameBtn.addActionListener(e -> {
-			// Clear any pending selection and notify listeners that the game should end
 			resetSelection();
 			gameEndRequested.run();
 		});
@@ -162,9 +168,7 @@ public class BoardView extends JPanel {
 	}
 
 	private void onCellClicked(int row, int col) {
-		// Build a Coord instance using (col,row) to match other code in the project
 		Coord clicked = new Coord(col, row);
-		// Selection flow: first click selects source, second click selects destination and emits event
 		if (pendingSource == null) {
 			pendingSource = clicked;
 			highlightCell(pendingSource.row, pendingSource.col, true);
@@ -176,7 +180,6 @@ public class BoardView extends JPanel {
 			    )
 			);
 		} else {
-			// Clear highlight of the previous source
 			highlightCell(pendingSource.row, pendingSource.col, false);
 			Coord src = pendingSource;
 			Coord dst = clicked;
