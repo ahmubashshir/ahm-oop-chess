@@ -6,6 +6,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
+import bd.ac.miu.cse.b60.oop.ahm.chess.display.SwingDisplay;
 import java.awt.*;
 import java.util.Objects;
 import javax.swing.*;
@@ -60,13 +61,13 @@ public class BoardView extends JPanel {
 	private final JPanel blackCapturedPanel = new JPanel();
 	private final JPanel bottomContainer = new JPanel(new BorderLayout(6, 6));
 	private final JPanel statusPanel = new JPanel(new BorderLayout(6, 6));
-	private final JLabel statusLabel = new JLabel("Ready");
 	private final JLabel playerInfoLabel = new JLabel(
 	    "Player: N/A    Time: 00:00:00"
 	);
 
 	private final Runnable gameEndRequested;
 	private final Display.MoveListener moveListener;
+	private final SwingDisplay display;
 
 	/**
 	 * Pending selected source coordinate (null when none selected).
@@ -77,13 +78,18 @@ public class BoardView extends JPanel {
 	/**
 	 * Constructs the BoardView and builds its internal Swing components.
 	 */
-	public BoardView(Display.MoveListener listener, Runnable callback) {
+	public BoardView(
+	    Display.MoveListener listener,
+	    Runnable callback,
+	    SwingDisplay display
+	) {
 		setLayout(new BorderLayout(8, 8));
 		buildBoardArea();
 		buildSidePanels();
 		buildStatusArea();
 		gameEndRequested = callback;
 		moveListener = listener;
+		this.display = display;
 	}
 
 	private void buildBoardArea() {
@@ -92,7 +98,7 @@ public class BoardView extends JPanel {
 		JPanel boardPanel = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
 		boardPanel.setBorder(new LineBorder(Color.DARK_GRAY));
 
-		Font cellFont = new Font(Font.MONOSPACED, Font.PLAIN, 20);
+		Font cellFont = new Font(Font.MONOSPACED, Font.BOLD, 36);
 
 		for (int r = 0; r < BOARD_SIZE; r++) {
 			for (int c = 0; c < BOARD_SIZE; c++) {
@@ -141,17 +147,16 @@ public class BoardView extends JPanel {
 
 	private void buildStatusArea() {
 		playerInfoLabel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
-		statusLabel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 		statusPanel.setPreferredSize(new Dimension(0, 36));
 		statusPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		statusPanel.add(playerInfoLabel, BorderLayout.WEST);
-		statusPanel.add(statusLabel, BorderLayout.CENTER);
 
 		JButton endGameBtn = new JButton("End Current Game");
 		endGameBtn.setFocusable(false);
 		endGameBtn.setMargin(new Insets(4, 8, 4, 8));
 		endGameBtn.addActionListener(e -> {
 			resetSelection();
+			display.showMessage("Game Ended");
 			gameEndRequested.run();
 		});
 		statusPanel.add(endGameBtn, BorderLayout.EAST);
@@ -162,13 +167,6 @@ public class BoardView extends JPanel {
 		if (pendingSource == null) {
 			pendingSource = clicked;
 			highlightCell(pendingSource.row, pendingSource.col, true);
-			setStatus(
-			    String.format(
-			        "Selected source: %c%d",
-			        'a' + pendingSource.col,
-			        pendingSource.row + 1
-			    )
-			);
 		} else {
 			highlightCell(pendingSource.row, pendingSource.col, false);
 			Coord src = pendingSource;
@@ -176,15 +174,6 @@ public class BoardView extends JPanel {
 			pendingSource = null;
 			// Notify listeners on EDT to avoid threading surprises
 			moveListener.onMoveRequested(src, dst);
-			setStatus(
-			    String.format(
-			        "Move requested: %c%d -> %c%d",
-			        (char) ('a' + src.col),
-			        src.row + 1,
-			        (char) ('a' + dst.col),
-			        dst.row + 1
-			    )
-			);
 		}
 	}
 
@@ -226,7 +215,6 @@ public class BoardView extends JPanel {
 				cell.setText(p == null ? "" : p.getSymbol());
 			}
 		}
-		setStatus("Board updated");
 	}
 
 	/**
@@ -276,47 +264,6 @@ public class BoardView extends JPanel {
 		whiteCapturedPanel.repaint();
 		blackCapturedPanel.revalidate();
 		blackCapturedPanel.repaint();
-
-		setStatus("Captured pieces updated");
-	}
-
-	/**
-	 * Show a short status message in the status area.
-	 *
-	 * @param message message to show
-	 */
-	public void showMessage(String message) {
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(() -> showMessage(message));
-			return;
-		}
-		setStatus(message);
-	}
-
-	/**
-	 * Show an error to the user (dialog + status).
-	 *
-	 * @param message error message
-	 */
-	public void showError(String message) {
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(() -> showError(message));
-			return;
-		}
-		statusLabel.setForeground(Color.RED);
-		statusLabel.setText("ERROR: " + message);
-		JOptionPane.showMessageDialog(
-		    SwingUtilities.getWindowAncestor(this),
-		    message,
-		    "Error",
-		    JOptionPane.ERROR_MESSAGE
-		);
-		// reset status color shortly after
-		javax.swing.Timer t = new javax.swing.Timer(1200, e ->
-		    statusLabel.setForeground(Color.BLACK)
-		                                           );
-		t.setRepeats(false);
-		t.start();
 	}
 
 	/**
@@ -325,61 +272,35 @@ public class BoardView extends JPanel {
 	 * @param playerColor color name
 	 * @param timeConsumed time consumed
 	 */
-	public void showPlayerInfo(
+	public void updatePlayerInfo(
 	    final String playerColor,
 	    final java.time.LocalTime timeConsumed
 	) {
 		if (!SwingUtilities.isEventDispatchThread()) {
 			SwingUtilities.invokeLater(() ->
-			                           showPlayerInfo(playerColor, timeConsumed)
+			                           updatePlayerInfo(playerColor, timeConsumed)
 			                          );
 			return;
 		}
 		playerInfoLabel.setText(
 		    String.format(
-		        "%s Player's turn. Time: %02d:%02d:%02d",
+		        "%s Player's turn. Time: %s",
 		        playerColor,
-		        timeConsumed.getHour(),
-		        timeConsumed.getMinute(),
-		        timeConsumed.getSecond()
+		        formatTime(timeConsumed)
 		    )
 		);
 	}
 
 	/**
-	 * Present a game-end message to the user.
+	 * Formats a {@code LocalTime} object as a {@code String} in HH:mm:ss format.
 	 *
-	 * @param message end-of-game message
+	 * @param time the {@code LocalTime} to format
+	 * @return a {@code String} representation of the time in HH:mm:ss
 	 */
-	public void showGameEnd(String message) {
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(() -> showGameEnd(message));
-			return;
-		}
-		JOptionPane.showMessageDialog(
-		    SwingUtilities.getWindowAncestor(this),
-		    message,
-		    "Game Over",
-		    JOptionPane.INFORMATION_MESSAGE
-		);
-		setStatus("Game over");
-	}
-
-	/**
-	 * Show a check warning to the user.
-	 */
-	public void showCheckWarning() {
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(this::showCheckWarning);
-			return;
-		}
-		JOptionPane.showMessageDialog(
-		    SwingUtilities.getWindowAncestor(this),
-		    "You are in check!",
-		    "Check",
-		    JOptionPane.WARNING_MESSAGE
-		);
-		setStatus("Check!");
+	private String formatTime(java.time.LocalTime time) {
+		java.time.format.DateTimeFormatter formatter =
+		    java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
+		return time.format(formatter);
 	}
 
 	/**
@@ -389,12 +310,6 @@ public class BoardView extends JPanel {
 		if (pendingSource != null) {
 			highlightCell(pendingSource.row, pendingSource.col, false);
 			pendingSource = null;
-			setStatus("Selection cleared");
 		}
-	}
-
-	private void setStatus(String message) {
-		statusLabel.setForeground(Color.BLACK);
-		statusLabel.setText(message);
 	}
 }

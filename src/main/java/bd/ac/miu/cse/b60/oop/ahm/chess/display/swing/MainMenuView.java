@@ -70,7 +70,7 @@ public class MainMenuView extends JPanel {
 		setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
 		JLabel header = new JLabel(
-		    "AHM CHESS GAME - MAIN MENU",
+		    "OOPChess: Main Menu",
 		    SwingConstants.CENTER
 		);
 		header.setFont(header.getFont().deriveFont(Font.BOLD, 16f));
