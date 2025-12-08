@@ -4,6 +4,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
 
 /**
  * The Pawn class represents a pawn chess piece.
@@ -24,6 +25,39 @@ public class Pawn extends Piece {
 	public Pawn(Color color, Game game) {
 		super("Pawn", color, game);
 		this.hasMoved = false;
+	}
+
+	@Override
+	protected byte getTypeByte() {
+		return 5;
+	}
+
+	@Override
+	public void moveNotify() {
+		if (hasMoved) return;
+		this.hasMoved = true;
+	}
+
+	@Override
+	public SaveData save() {
+		// 3 bytes from Piece + 1 byte for hasMoved
+		byte[] base = super.save().data;
+		byte hasMovedByte = (byte) (hasMoved ? 1 : 0);
+		byte[] out = new byte[base.length + 1];
+		System.arraycopy(base, 0, out, 0, base.length);
+		out[base.length] = hasMovedByte;
+		return new SaveData(out);
+	}
+
+	@Override
+	public void load(SaveData state) {
+		super.load(state);
+		byte[] data = state.data;
+		if (data.length > 3) {
+			this.hasMoved = (data[3] == 1);
+		} else {
+			this.hasMoved = false;
+		}
 	}
 
 	/**

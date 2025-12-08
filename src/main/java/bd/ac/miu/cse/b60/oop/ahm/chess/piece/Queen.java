@@ -17,6 +17,11 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
  */
 public class Queen extends Piece {
 
+	@Override
+	protected byte getTypeByte() {
+		return 1;
+	}
+
 	/**
 	 * Constructs a new {@code Queen} object with the specified color.
 	 *

@@ -14,6 +14,11 @@ public class Rook extends Piece {
 
 	private boolean hasMoved; // Tracks whether the rook has moved (important for castling)
 
+	@Override
+	protected byte getTypeByte() {
+		return 2;
+	}
+
 	/**
 	 * Constructs a new rook with the specified color.
 	 *

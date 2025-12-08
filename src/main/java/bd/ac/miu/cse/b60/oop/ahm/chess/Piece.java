@@ -16,10 +16,64 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Knight
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn
  */
-public abstract class Piece {
+public abstract class Piece
+	implements
+	bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable,
+	bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable {
 
 	/** The formatted name of the piece, including its color tag. */
 	private String name;
+
+	// Type mapping: King=0, Queen=1, Rook=2, Bishop=3, Knight=4, Pawn=5
+	private static final Class<?>[] PIECE_TYPES = {
+		bd.ac.miu.cse.b60.oop.ahm.chess.piece.King.class,
+		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Queen.class,
+		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Rook.class,
+		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Bishop.class,
+		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Knight.class,
+		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn.class,
+	};
+
+	protected abstract byte getTypeByte();
+
+	@Override
+	public bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData save() {
+		byte typeByte = getTypeByte();
+		byte colorByte = (isWhite() ? (byte) 1 : (byte) 0);
+		byte capturedByte = (getCaptured() ? (byte) 1 : (byte) 0);
+		return new bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData(
+		           new byte[] { typeByte, colorByte, capturedByte }
+		       );
+	}
+
+	@Override
+	public void load(bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state) {
+		byte[] data = state.data;
+		setCaptured(data[2] == 1);
+	}
+
+	public static Piece createFromBytes(
+	    byte typeByte,
+	    byte colorByte,
+	    bd.ac.miu.cse.b60.oop.ahm.chess.Game game
+	) {
+		try {
+			Class<?> clazz = PIECE_TYPES[typeByte];
+			java.lang.reflect.Constructor<?> ctor = clazz.getConstructor(
+			        bd.ac.miu.cse.b60.oop.ahm.chess.Color.class,
+			        bd.ac.miu.cse.b60.oop.ahm.chess.Game.class
+			                                        );
+			bd.ac.miu.cse.b60.oop.ahm.chess.Color color = (colorByte == 1)
+			    ? bd.ac.miu.cse.b60.oop.ahm.chess.Color.WHITE
+			    : bd.ac.miu.cse.b60.oop.ahm.chess.Color.BLACK;
+			return (Piece) ctor.newInstance(color, game);
+		} catch (Exception e) {
+			throw new RuntimeException(
+			    "Failed to instantiate piece from byte",
+			    e
+			);
+		}
+	}
 
 	/** The game instance that owns this piece. */
 	protected final Game game;

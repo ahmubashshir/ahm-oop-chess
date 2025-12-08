@@ -127,6 +127,11 @@ public class King extends Piece {
 		this.hasMoved = true;
 	}
 
+	@Override
+	protected byte getTypeByte() {
+		return 0;
+	}
+
 	/**
 	 * Returns whether the {@code King} has moved.
 	 * Used to determine eligibility for castling.

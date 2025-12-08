@@ -11,6 +11,11 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
  */
 public class Bishop extends Piece {
 
+	@Override
+	protected byte getTypeByte() {
+		return 3;
+	}
+
 	/**
 	 * Constructs a new bishop with the specified color.
 	 *

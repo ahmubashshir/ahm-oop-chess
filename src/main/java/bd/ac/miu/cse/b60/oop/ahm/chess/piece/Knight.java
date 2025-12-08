@@ -25,6 +25,11 @@ public class Knight extends Piece {
 		super("Knight", color, game);
 	}
 
+	@Override
+	protected byte getTypeByte() {
+		return 4;
+	}
+
 	/**
 	 * Returns the symbol representation of the knight.
 	 *
