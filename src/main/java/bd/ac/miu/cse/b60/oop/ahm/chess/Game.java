@@ -122,6 +122,12 @@ public class Game implements Saveable, Loadable {
 		return board;
 	}
 
+	/**
+	 * Gets the piece located at the specified coordinates on the board.
+	 *
+	 * @param coord the coordinates of the square
+	 * @return the piece at the given coordinates, or {@code null} if the square is empty
+	 */
 	public Piece getPiece(Coord coord) {
 		return board[coord.row][coord.col].getPiece();
 	}

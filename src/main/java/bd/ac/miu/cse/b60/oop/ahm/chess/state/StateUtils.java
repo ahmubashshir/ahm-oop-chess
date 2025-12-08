@@ -6,7 +6,16 @@ import java.util.zip.CRC32;
 /**
  * Utility class for state serialization, deserialization, and checksum calculation.
  */
+/**
+ * Utility class for state serialization, deserialization, and checksum calculation.
+ */
 public class StateUtils {
+
+	/**
+	 * Private constructor to prevent instantiation.
+	 * This class only contains static utility methods.
+	 */
+	private StateUtils() {}
 
 	/**
 	 * Calculates the CRC32 checksum for the given byte array.
@@ -62,7 +71,9 @@ public class StateUtils {
 	 */
 	public static StateParts extractChecksumAndData(byte[] combined) {
 		if (combined.length < 4) {
-			throw new IllegalArgumentException("Combined array too short for checksum.");
+			throw new IllegalArgumentException(
+			    "Combined array too short for checksum."
+			);
 		}
 		byte[] checksum = new byte[4];
 		System.arraycopy(combined, 0, checksum, 0, 4);
@@ -75,9 +86,23 @@ public class StateUtils {
 	 * Helper class to hold checksum and data parts.
 	 */
 	public static class StateParts {
+
+		/**
+		 * The CRC32 checksum for the data.
+		 */
 		public final byte[] checksum;
+
+		/**
+		 * The actual data bytes.
+		 */
 		public final byte[] data;
 
+		/**
+		 * Constructs a StateParts object containing checksum and data.
+		 *
+		 * @param checksum the CRC32 checksum as a byte array
+		 * @param data the actual data bytes
+		 */
 		public StateParts(byte[] checksum, byte[] data) {
 			this.checksum = checksum;
 			this.data = data;

@@ -34,6 +34,12 @@ public abstract class Piece
 		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn.class,
 	};
 
+	/**
+	 * Returns the type byte representing this piece.
+	 * Used for serialization and identification of piece type.
+	 *
+	 * @return the type byte for this piece
+	 */
 	protected abstract byte getTypeByte();
 
 	@Override
@@ -52,6 +58,15 @@ public abstract class Piece
 		setCaptured(data[2] == 1);
 	}
 
+	/**
+	 * Creates a Piece instance from its serialized byte representation.
+	 *
+	 * @param typeByte  the type byte representing the piece type
+	 * @param colorByte the color byte (1 for white, 0 for black)
+	 * @param game      the game instance to associate with the piece
+	 * @return the deserialized Piece instance
+	 * @throws RuntimeException if instantiation fails
+	 */
 	public static Piece createFromBytes(
 	    byte typeByte,
 	    byte colorByte,
@@ -161,6 +176,10 @@ public abstract class Piece
 	    int destCol
 	);
 
+	/**
+	 * Notifies the piece that it has moved.
+	 * Subclasses may override to implement custom behavior after a move.
+	 */
 	public void moveNotify() {}
 
 	/**

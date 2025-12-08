@@ -202,7 +202,16 @@ public class Player
 		return new bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData(result);
 	}
 
-	// Owner must pass Game instance for context
+	/**
+	 * Loads the player's state from the provided {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData} object and game context.
+	 * <p>
+	 * This method restores the player's ID, turn counts, time consumed, and captured pieces.
+	 * The {@code game} parameter is required to properly instantiate captured pieces.
+	 * </p>
+	 *
+	 * @param state the {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData} containing the serialized player state
+	 * @param game  the {@link Game} instance for context when reconstructing pieces
+	 */
 	public void load(
 	    bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state,
 	    bd.ac.miu.cse.b60.oop.ahm.chess.Game game

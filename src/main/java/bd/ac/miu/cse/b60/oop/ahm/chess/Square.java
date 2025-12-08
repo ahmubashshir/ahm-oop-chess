@@ -2,6 +2,13 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.*;
 
+/**
+ * Represents a square on the chess board.
+ * <p>
+ * Each square may contain a chess piece or be empty. This class provides methods
+ * for saving and loading its state, as well as for setting and retrieving the piece.
+ * </p>
+ */
 public class Square implements Saveable, Loadable {
 
 	/** The chess piece currently on this square, or {@code null} if empty. */
@@ -49,7 +56,12 @@ public class Square implements Saveable, Loadable {
 		}
 	}
 
-	// Owner must pass Game instance for context
+	/**
+	 * Loads the state of this square from the provided SaveData and Game context.
+	 *
+	 * @param state the SaveData containing the serialized state of the square
+	 * @param game  the Game instance for context (used to instantiate pieces)
+	 */
 	public void load(SaveData state, Game game) {
 		try {
 			java.io.ByteArrayInputStream bais =
