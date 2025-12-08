@@ -70,6 +70,11 @@ public class SwingDisplay implements Display {
 
 	private volatile boolean exitRequested = false;
 
+	/**
+	 * Constructs a new {@code SwingDisplay} instance.
+	 * <p>
+	 * The UI is created lazily when {@link #run()} is called on the Event Dispatch Thread (EDT).
+	 */
 	public SwingDisplay() {
 		// UI is created lazily on run()/EDT
 	}

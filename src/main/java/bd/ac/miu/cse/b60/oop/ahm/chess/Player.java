@@ -6,7 +6,11 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 /**
- * Represents a chess player with a unique ID, timer, and methods to manage time and captured pieces.
+ * Represents a player in a chess game, managing their identity, time control, captured pieces, and turn tracking.
+ * <p>
+ * Each player has a unique ID, can be assigned a time limit, and keeps track of captured pieces and the number of turns taken.
+ * Provides methods for timer management and turn counting.
+ * </p>
  */
 public class Player {
 
@@ -28,17 +32,17 @@ public class Player {
 	/** Indicates whether the time limit has been reached. */
 	private boolean isTimeFinished = false;
 
-	/** Array of pieces captured by the player. */
+	/** Collection of pieces captured by this player. */
 	private Vector<Piece> capturedPieces;
 
-	/** Number of turns taken by the player. */
+	/** Number of turns taken by this player. */
 	private int numOfTurns = 0;
 
-	/** Maximum number of turns allowed, default is 50. */
+	/** Maximum number of turns allowed for this player (default is 50). */
 	private int maxNumOfTurns = 50;
 
 	/**
-	 * Constructs a {@code Player} with the specified ID.
+	 * Constructs a Player with the specified ID.
 	 *
 	 * @param id the unique identifier for the player
 	 */
@@ -48,7 +52,7 @@ public class Player {
 	}
 
 	/**
-	 * Constructs a {@code Player} with the specified ID and time limit.
+	 * Constructs a Player with the specified ID and time limit.
 	 *
 	 * @param id        the unique identifier for the player
 	 * @param timeLimit the time limit for the player's activities
@@ -60,7 +64,7 @@ public class Player {
 	}
 
 	/**
-	 * Returns the player's unique ID.
+	 * Gets the player's unique ID.
 	 *
 	 * @return the player's ID
 	 */
@@ -69,26 +73,26 @@ public class Player {
 	}
 
 	/**
-	 * Adds a captured piece to the player's array.
+	 * Adds a captured piece to this player's collection.
 	 *
-	 * @param capturedPiece the {@code Piece} captured by the player
+	 * @param capturedPiece the Piece captured by the player
 	 */
 	public void capturePiece(Piece capturedPiece) {
 		capturedPieces.add(capturedPiece);
 	}
 
 	/**
-	 * Returns the array of captured pieces.
+	 * Gets all pieces captured by this player.
 	 *
-	 * @return an array of captured {@code Piece} objects
+	 * @return an array of captured Piece objects
 	 */
 	public Piece[] getCapturedPieces() {
-		return capturedPieces.toArray(new Piece[capturedPieces.size()]);
+		return capturedPieces.toArray(new Piece[0]);
 	}
 
 	/**
 	 * Starts the player's timer, incrementing {@code timeConsumed} by one second at regular intervals.
-	 * Critical: Timer logic ensures time tracking and game-ending conditions.
+	 * If a time limit is set and reached, marks the player's time as finished.
 	 */
 	public void startTimer() {
 		timer = new Timer();
@@ -112,7 +116,7 @@ public class Player {
 	}
 
 	/**
-	 * Returns whether the time limit has been reached.
+	 * Checks if the player's time limit has been reached.
 	 *
 	 * @return {@code true} if the time limit is reached, {@code false} otherwise
 	 */
@@ -138,20 +142,22 @@ public class Player {
 	 * Stops the player's timer.
 	 */
 	public void stopTimer() {
-		timer.cancel();
+		if (timer != null) {
+			timer.cancel();
+		}
 	}
 
 	/**
-	 * Returns the total time consumed by the player.
+	 * Gets the total time consumed by the player.
 	 *
-	 * @return the {@code LocalTime} representing time consumed
+	 * @return the LocalTime representing time consumed
 	 */
 	public LocalTime getTimeConsumed() {
 		return timeConsumed;
 	}
 
 	/**
-	 * Returns the total time consumed in minutes.
+	 * Gets the total time consumed in minutes.
 	 *
 	 * @return the time consumed in minutes
 	 */
@@ -160,7 +166,7 @@ public class Player {
 	}
 
 	/**
-	 * Sets the maximum number of turns allowed.
+	 * Sets the maximum number of turns allowed for this player.
 	 *
 	 * @param newMax the new maximum number of turns
 	 */
@@ -169,7 +175,7 @@ public class Player {
 	}
 
 	/**
-	 * Returns the maximum number of turns allowed.
+	 * Gets the maximum number of turns allowed for this player.
 	 *
 	 * @return the maximum number of turns
 	 */
@@ -178,7 +184,7 @@ public class Player {
 	}
 
 	/**
-	 * Returns the number of turns taken by the player.
+	 * Gets the number of turns taken by this player.
 	 *
 	 * @return the number of turns completed
 	 */
@@ -187,7 +193,7 @@ public class Player {
 	}
 
 	/**
-	 * Sets the number of turns taken by the player.
+	 * Sets the number of turns taken by this player.
 	 *
 	 * @param newNum the new number of turns
 	 */

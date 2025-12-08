@@ -1,28 +1,31 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 /**
- * Enum representing the status of a chess move attempt.
- * This is used to track the current state of the game or menu selection.
+ * Represents the current state of the chess game or menu selection.
+ * <p>
+ * This enum is used to track the user's navigation or game session status,
+ * such as starting a game, ending a session, or exiting the application.
+ * </p>
  */
 public enum State {
-	/** Indicates nothing was selected. */
+	/** No selection has been made. */
 	NONE,
 
-	/** Indicates Start game entry was selected. */
+	/** The user selected to start a new game. */
 	START,
 
-	/** Indicates User Requested game session end. */
+	/** The user requested to end the current game session. */
 	END,
 
-	/** Indicates Exit entry was selected. */
+	/** The user selected to exit the application. */
 	EXIT;
 
 	/**
-	 * Constructs a {@code State} from menu id.
+	 * Returns the {@code State} corresponding to a menu index.
 	 *
-	 * @param id menu index.
-	 * @return {@code State}
-	 * @throws IllegalArgumentException {@code id} is outside the {@code State}.
+	 * @param id the menu index (1 for START, 2 for EXIT, others for NONE)
+	 * @return the corresponding {@code State}
+	 * @throws IllegalArgumentException if {@code id} is outside the valid range
 	 */
 	public static State fromInt(int id) {
 		switch (id) {

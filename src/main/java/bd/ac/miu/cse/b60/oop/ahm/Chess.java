@@ -35,6 +35,11 @@ public final class Chess
 		display.addMoveListener(this);
 	}
 
+	/**
+	 * Runs the main game loop using the configured display.
+	 * This method delegates control to the display's run method,
+	 * which manages user interaction and game flow.
+	 */
 	public void run() {
 		display.run();
 	}

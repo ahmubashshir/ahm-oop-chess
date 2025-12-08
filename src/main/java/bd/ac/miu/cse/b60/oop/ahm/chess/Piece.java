@@ -1,10 +1,13 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 /**
- * Represents a generic chess piece, serving as the base class for all specific chess pieces.
- *
- * <p>This abstract class defines the common properties and behaviors that all chess pieces share.
- * Specific piece types (King, Queen, Rook, etc.) extend this class to implement their unique movement patterns.</p>
+ * Abstract base class for all chess pieces.
+ * <p>
+ * This class defines the common properties and behaviors shared by all chess pieces,
+ * such as color, name, capture state, and movement validation. Specific piece types
+ * (King, Queen, Rook, Bishop, Knight, Pawn) should extend this class and implement
+ * their unique movement logic.
+ * </p>
  *
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.King
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Queen
@@ -18,11 +21,12 @@ public abstract class Piece {
 	/** The formatted name of the piece, including its color tag. */
 	private String name;
 
-	/** Game Instance owning this piece */
+	/** The game instance that owns this piece. */
 	protected final Game game;
 
 	/**
 	 * The color of the piece (white or black).
+	 *
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Color
 	 */
 	private final Color color;
@@ -31,11 +35,11 @@ public abstract class Piece {
 	private boolean isCaptured;
 
 	/**
-	 * Constructs a {@code Piece} with the specified name and color.
+	 * Constructs a new chess piece.
 	 *
 	 * @param name  the base name of the piece (e.g., "King", "Queen")
-	 * @param color the {@code Color} of the piece
-	 * @param game  the {@code Game} instance owning this piece
+	 * @param color the color of the piece
+	 * @param game  the game instance that owns this piece
 	 */
 	protected Piece(String name, Color color, Game game) {
 		this.color = color;
@@ -44,23 +48,23 @@ public abstract class Piece {
 	}
 
 	/**
-	 * Returns the formatted name of the piece.
+	 * Gets the formatted name of the piece, including its color tag.
 	 *
-	 * @return the name of the piece, including its color tag
+	 * @return the name of the piece (e.g., "King&lt;WHITE&gt;")
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * Returns the symbol representing the piece.
+	 * Gets the symbol representing this piece (e.g., "K" for King).
 	 *
 	 * @return the symbol of the piece
 	 */
 	public abstract String getSymbol();
 
 	/**
-	 * Sets the captured status of the piece.
+	 * Sets whether this piece has been captured.
 	 *
 	 * @param isCaptured {@code true} if the piece is captured, {@code false} otherwise
 	 */
@@ -69,7 +73,7 @@ public abstract class Piece {
 	}
 
 	/**
-	 * Returns whether the piece has been captured.
+	 * Checks if this piece has been captured.
 	 *
 	 * @return {@code true} if the piece is captured, {@code false} otherwise
 	 */
@@ -78,7 +82,7 @@ public abstract class Piece {
 	}
 
 	/**
-	 * Returns whether the piece is white.
+	 * Checks if this piece is white.
 	 *
 	 * @return {@code true} if the piece is white, {@code false} if black
 	 */
@@ -87,7 +91,8 @@ public abstract class Piece {
 	}
 
 	/**
-	 * Checks if a move from the source square to the destination square is valid for this piece.
+	 * Determines if a move from the source square to the destination square is valid for this piece.
+	 * This method must be implemented by each specific piece type.
 	 *
 	 * @param sourceRow the row index of the source square
 	 * @param sourceCol the column index of the source square
@@ -103,11 +108,11 @@ public abstract class Piece {
 	);
 
 	/**
-	 * Checks if a move from the source square to the destination square is valid for this piece.
-	 * This overload allows using Coord objects for convenience.
+	 * Determines if a move from the source square to the destination square is valid for this piece,
+	 * using {@link Coord} objects for convenience.
 	 *
-	 * @param src       Source square coordinates.
-	 * @param dst       Destination square coordinates.
+	 * @param src the source square coordinates
+	 * @param dst the destination square coordinates
 	 * @return {@code true} if the move is valid, {@code false} otherwise
 	 *
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord

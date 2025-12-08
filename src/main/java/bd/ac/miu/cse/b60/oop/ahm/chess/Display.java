@@ -3,11 +3,12 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 import java.time.LocalTime;
 
 /**
- * The {@code Display} interface is responsible for displaying the current state of
- * the chessboard and the captured pieces of each player to the display device.
- *
- * <p>This class defines the interface for rendering the chess game state.
- * Different implementations can provide various user interfaces (e.g., command line, GUI).</p>
+ * Interface for displaying the state of a chess game and interacting with the user.
+ * <p>
+ * Implementations of this interface are responsible for rendering the chessboard,
+ * showing captured pieces, handling user input, and displaying messages or errors.
+ * This abstraction allows for different user interfaces (e.g., CLI, GUI) to be plugged into the game logic.
+ * </p>
  *
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.display.CLIDisplay
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
@@ -16,52 +17,49 @@ import java.time.LocalTime;
  */
 public interface Display {
 	/**
-	 * Prints the current state of the chessboard to the display device.
+	 * Updates the display to show the current state of the chessboard.
 	 *
-	 * @param game the current game state
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
+	 * @param game the current game state to be rendered
 	 */
 	void updateBoard(final Game game);
 
 	/**
-	 * Prints the captured pieces for each player.
+	 * Updates the display to show the captured pieces for each player.
 	 *
-	 * @param game the current game state
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
+	 * @param game the current game state containing captured pieces
 	 */
 	void updateCapturedPieces(final Game game);
 
 	/**
-	 * Asks Player to enter coordinate for an action.
+	 * Prompts the user to enter a coordinate for an action (e.g., move or selection).
+	 * <p>
+	 * Implementations may ignore this in event-driven UIs.
+	 * </p>
 	 *
-	 * <p>This method gets input coordinates for piece movement or selection.
-	 * It can be implemented as a no-op in event-driven UI implementations.</p>
-	 *
-	 * @param query info about the wanted coordinate.
-	 * @return a {@code Coord} object containing the column and row, or {@code null}
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game#move
+	 * @param query a message describing the requested coordinate
+	 * @return a {@code Coord} object containing the column and row, or {@code null} if cancelled
 	 */
 	Coord getCoord(String query);
 
 	/**
-	 * Displays the main menu and reads the user's choice.
-	 *
-	 * <p>This method renders the game's main menu and handles user selection.
-	 * It can be implemented as a no-op in event-driven UI implementations.</p>
+	 * Displays the main menu and handles user selection.
+	 * <p>
+	 * Implementations may ignore this in event-driven UIs.
+	 * </p>
 	 */
 	void showMainMenu();
 
 	/**
 	 * Starts the display event loop.
-	 *
-	 * For CLI implementations, this can be a synchronous loop that handles user input.
+	 * <p>
+	 * For CLI implementations, this may be a synchronous loop that handles user input.
 	 * For GUI implementations, this should start the GUI framework's event dispatch thread.
+	 * </p>
 	 */
 	void run();
 
 	/**
-	 * Displays a message to the user.
+	 * Displays a general message to the user.
 	 *
 	 * @param message the message to display
 	 */
@@ -77,27 +75,27 @@ public interface Display {
 	/**
 	 * Updates the display with the current player's information.
 	 *
-	 * @param playerColor the color of the current player
+	 * @param playerColor the color of the current player (e.g., "White" or "Black")
 	 * @param timeConsumed the time consumed by the current player
 	 */
 	void showPlayerInfo(String playerColor, LocalTime timeConsumed);
 
 	/**
-	 * Shows a move status message.
+	 * Displays a move status message to the user.
 	 *
 	 * @param status the status of the move
 	 */
 	void showMoveStatus(MoveStatus status);
 
 	/**
-	 * Shows the game end message.
+	 * Displays a message indicating the game has ended.
 	 *
 	 * @param message the end game message
 	 */
 	void showGameEnd(String message);
 
 	/**
-	 * Shows a check warning.
+	 * Displays a warning that the current player's king is in check.
 	 */
 	void showCheckWarning();
 
@@ -116,7 +114,7 @@ public interface Display {
 	void addMenuListener(StateListener listener);
 
 	/**
-	 * Interface for move event listeners.
+	 * Listener interface for piece move events.
 	 */
 	interface MoveListener {
 		/**
@@ -129,7 +127,7 @@ public interface Display {
 	}
 
 	/**
-	 * Interface for menu event listeners.
+	 * Listener interface for menu selection events.
 	 */
 	interface StateListener {
 		/**

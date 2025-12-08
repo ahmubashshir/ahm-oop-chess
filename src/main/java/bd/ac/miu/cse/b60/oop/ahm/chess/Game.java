@@ -4,40 +4,42 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.piece.*;
 import java.time.LocalTime;
 
 /**
- * Represents a chess game with a board, players, and methods for moves.
+ * Central controller for a chess game, managing the board, players, moves, and game state.
+ * <p>
+ * The {@code Game} class is responsible for initializing the board, handling player turns,
+ * validating and executing moves, enforcing chess rules (including castling and check),
+ * and managing timers and draw conditions.
+ * </p>
  *
- * <p>The Game class is the central controller for chess gameplay, managing the board state,
- * player turns, piece movement, and game rules enforcement.</p>
- *
- * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
- * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
- * @see bd.ac.miu.cse.b60.oop.ahm.chess.Piece
+ * @see Player
+ * @see Square
+ * @see Piece
  */
 public class Game {
 
-	/** Default width of the game board. */
+	/** Default width of the chess board (number of columns). */
 	public static int DEFAULT_BOARD_WIDTH = 8;
 
-	/** Default height of the game board. */
+	/** Default height of the chess board (number of rows). */
 	public static int DEFAULT_BOARD_HEIGHT = 8;
 
-	/** The game board as a 2D array of squares. */
+	/** The chess board, represented as a 2D array of squares. */
 	private Square[][] board;
 
-	/** Array of players in the game. */
+	/** The two players participating in the game. */
 	private Player[] players;
 
-	/** The current player making a move. */
+	/** The player whose turn it is to move. */
 	private Player currentPlayer;
 
 	/**
-	 * Performs castling.
+	 * Performs the castling move by moving both the king and rook to their new positions.
 	 *
-	 * @param kingsrc Column of the king's source square.
-	 * @param kingdst Column of the king's destination square.
-	 * @param rooksrc Column of the rook's source square.
-	 * @param rookdst Column of the rook's destination square.
-	 * @param row     Row of the castling move.
+	 * @param kingsrc the column of the king's source square
+	 * @param kingdst the column of the king's destination square
+	 * @param rooksrc the column of the rook's source square
+	 * @param rookdst the column of the rook's destination square
+	 * @param row     the row where castling occurs (same for king and rook)
 	 */
 	private void performCastling(
 	    int kingsrc,
@@ -59,11 +61,11 @@ public class Game {
 	}
 
 	/**
-	 * Checks if the path is clear between two squares horizontally or vertically.
+	 * Checks if the path is clear (no pieces in between) between two squares horizontally or vertically.
 	 *
-	 * @param src Source square coordinates.
-	 * @param dst Destination square coordinates.
-	 * @return {@code true} if the path is clear, {@code false} otherwise.
+	 * @param src the source square coordinates
+	 * @param dst the destination square coordinates
+	 * @return {@code true} if the path is clear, {@code false} otherwise
 	 */
 	private boolean isPathClear(Coord src, Coord dst) {
 		if (src.row == dst.row) {
@@ -89,9 +91,9 @@ public class Game {
 	}
 
 	/**
-	 * Initializes a new game with a time limit.
+	 * Constructs a new chess game and initializes the board and players.
 	 *
-	 * @param timeLimit The time limit for each player.
+	 * @param timeLimit the time limit for each player (may be {@code null} for unlimited)
 	 */
 	public Game(LocalTime timeLimit) {
 		board = new Square[DEFAULT_BOARD_WIDTH][DEFAULT_BOARD_HEIGHT];
@@ -107,16 +109,17 @@ public class Game {
 	}
 
 	/**
-	 * Gets the current game board.
+	 * Returns the current chess board.
 	 *
-	 * @return The current game board as a 2D array.
+	 * @return the current game board as a 2D array of squares
 	 */
 	public Square[][] getBoard() {
 		return board;
 	}
 
 	/**
-	 * Initializes the positions of chess pieces on the board.
+	 * Initializes the board with all chess pieces in their standard starting positions.
+	 * Fills empty squares with new {@code Square} instances.
 	 *
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Rook
@@ -161,35 +164,35 @@ public class Game {
 	}
 
 	/**
-	 * Sets the current player by ID.
+	 * Sets the current player by their player ID.
 	 *
-	 * @param playerID The ID of the player to set as current.
+	 * @param playerID the ID of the player to set as current (0 or 1)
 	 */
 	public void setCurrentPlayer(int playerID) {
 		currentPlayer = players[playerID];
 	}
 
 	/**
-	 * Gets the current player.
+	 * Returns the player whose turn it is to move.
 	 *
-	 * @return The current player.
+	 * @return the current player
 	 */
 	public Player getCurrentPlayer() {
 		return currentPlayer;
 	}
 
 	/**
-	 * Gets a player by ID.
+	 * Returns the player with the specified ID.
 	 *
-	 * @param playerID The ID of the player.
-	 * @return The player with the specified ID.
+	 * @param playerID the ID of the player (0 or 1)
+	 * @return the player with the specified ID
 	 */
 	public Player getPlayer(int playerID) {
 		return players[playerID];
 	}
 
 	/**
-	 * Switches the current player.
+	 * Switches the turn to the other player.
 	 */
 	public void switchPlayer() {
 		if (currentPlayer.getPlayerID() == 0) {
@@ -200,14 +203,15 @@ public class Game {
 	}
 
 	/**
-	 * Moves a piece from source to destination.
+	 * Attempts to move a piece from the source to the destination square, enforcing chess rules.
+	 * Handles captures, castling, and path validation.
 	 *
-	 * @param src Source square coordinates.
-	 * @param dst Destination square coordinates.
-	 * @return {@code MoveStatus} indicating the result of the move.
+	 * @param src the source square coordinates
+	 * @param dst the destination square coordinates
+	 * @return a {@code MoveStatus} indicating the result of the move
 	 *
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Coord
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.MoveStatus
+	 * @see Coord
+	 * @see MoveStatus
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.King
 	 */
 	public MoveStatus move(Coord src, Coord dst) {
@@ -281,9 +285,9 @@ public class Game {
 	}
 
 	/**
-	 * Checks if the current player's king is in check.
+	 * Checks if the current player's king is in check (under attack by any opponent piece).
 	 *
-	 * @return {@code true} if the king is in check, {@code false} otherwise.
+	 * @return {@code true} if the king is in check, {@code false} otherwise
 	 */
 	public boolean isCheck() {
 		boolean currentKingColor;
@@ -341,9 +345,9 @@ public class Game {
 	}
 
 	/**
-	 * Checks if the current player's king is alive.
+	 * Checks if the current player's king is still present on the board.
 	 *
-	 * @return {@code true} if the king is alive, {@code false} otherwise.
+	 * @return {@code true} if the king is alive, {@code false} otherwise
 	 */
 	public boolean isKingAlive() {
 		boolean currentKingColor = (currentPlayer == players[0]);
@@ -366,9 +370,9 @@ public class Game {
 	}
 
 	/**
-	 * Checks if the game is a draw based on the number of turns.
+	 * Checks if the game is a draw due to both players reaching their maximum number of turns.
 	 *
-	 * @return {@code true} if the game is a draw, {@code false} otherwise.
+	 * @return {@code true} if the game is a draw, {@code false} otherwise
 	 */
 	public boolean isDraw() {
 		return (
@@ -378,9 +382,9 @@ public class Game {
 	}
 
 	/**
-	 * Sets the maximum number of turns for the game.
+	 * Sets the maximum number of turns allowed for both players.
 	 *
-	 * @param num The maximum number of turns.
+	 * @param num the maximum number of turns
 	 */
 	public void setMaxNumOfTurns(int num) {
 		players[0].setMaxNumOfTurns(num);
@@ -388,38 +392,38 @@ public class Game {
 	}
 
 	/**
-	 * Gets the number of turns a player has completed.
+	 * Returns the number of turns completed by the specified player.
 	 *
-	 * @param player The player whose turns are counted.
-	 * @return The number of turns completed by the player.
+	 * @param player the player whose turns are counted
+	 * @return the number of turns completed by the player
 	 */
 	public int getNumOfTurns(Player player) {
 		return player.getNumOfTurns();
 	}
 
 	/**
-	 * Sets the number of turns for a player.
+	 * Increments the number of turns for a player by the specified amount.
 	 *
-	 * @param player The player whose turns are set.
-	 * @param num    The number of turns to set.
+	 * @param player the player whose turns are set
+	 * @param num    the number of turns to add
 	 */
 	public void setNumOfTurns(Player player, int num) {
 		player.setNumOfTurns(getNumOfTurns(player) + num);
 	}
 
 	/**
-	 * Checks if the time limit for the current player is finished.
+	 * Checks if the current player's time limit has been reached.
 	 *
-	 * @return {@code true} if the time is finished, {@code false} otherwise.
+	 * @return {@code true} if the time is finished, {@code false} otherwise
 	 */
 	public boolean isTimeFinished() {
 		return getCurrentPlayer().getIsTimeFinished();
 	}
 
 	/**
-	 * Gets the array of players.
+	 * Returns the array of players in the game.
 	 *
-	 * @return The array of players.
+	 * @return the array of players
 	 */
 	public Player[] getPlayerArray() {
 		return players;

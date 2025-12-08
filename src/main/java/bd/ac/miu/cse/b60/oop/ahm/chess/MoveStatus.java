@@ -1,31 +1,37 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 /**
- * Enum representing the status of a chess move attempt.
+ * Represents the result of a chess move attempt.
+ * <p>
+ * This enum provides detailed status codes for move validation, including
+ * successful moves, rule violations, and error conditions.
+ * </p>
  */
 public enum MoveStatus {
-	/** Indicates a valid move. */
+	/** The move is valid and was executed successfully. */
 	Ok("Ok"),
 
-	/** Indicates the selected piece does not belong to the player. */
+	/** The selected piece does not belong to the current player. */
 	PlayerError("Not your piece"),
 
-	/** Indicates the path between source and destination is obstructed. */
+	/** The path between source and destination is obstructed by another piece. */
 	PathError("Path is not clear"),
 
-	/** Indicates no piece exists at the source position. */
+	/** No piece exists at the source position. */
 	SourceError("No piece at source"),
 
-	/** Indicates the move is invalid for the selected piece. */
+	/** The move is not valid for the selected piece according to chess rules. */
 	MoveError("Invalid move for this piece"),
 
-	/** Indicates an invalid castling attempt. */
+	/** The castling move is invalid due to rule violation or board state. */
 	CastleError("Invalid castling movement"),
 
-	/** Indicates the destination contains a piece of the same color. */
+	/** The destination square contains a piece of the same color (cannot capture own piece). */
 	DestError("Can't capture your own piece");
 
-	/** The descriptive message associated with the move status. */
+	/**
+	 * A human-readable message describing the move status.
+	 */
 	public final String info;
 
 	/**

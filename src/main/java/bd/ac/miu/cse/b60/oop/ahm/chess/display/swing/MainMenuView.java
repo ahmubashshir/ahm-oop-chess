@@ -10,20 +10,7 @@ import javax.swing.*;
  * <b>Overview:</b>
  * <ul>
  *   <li>Displays "Start" and "Exit" options in a simple, embeddable panel.</li>
- *   <li>Integrates with {@link SwingDisplay} or any JFrame-based chess UI.</li>
  *   <li>Uses callbacks to notify the application when an option is selected.</li>
- * </ul>
- *
- * <b>Integration:</b>
- * <ul>
- *   <li>Designed to be placed inside the main application window (not as a modal dialog).</li>
- *   <li>Works seamlessly with event-driven architectures; callbacks allow flexible control flow.</li>
- * </ul>
- *
- * <b>Public API:</b>
- * <ul>
- *   <li>{@link MainMenuView#MainMenuView(Runnable, Runnable)}: Constructor with callbacks for Start and Exit.</li>
- *   <li>{@link MainMenuView#MainMenuView()}: Default constructor (no callbacks).</li>
  * </ul>
  *
  * <b>Usage Example:</b>
@@ -34,16 +21,16 @@ import javax.swing.*;
  *   );
  *   frame.getContentPane().add(menu, BorderLayout.CENTER);
  * </pre>
- *
- * <b>Extension Notes:</b>
- * <ul>
- *   <li>Override or extend this panel to add more menu options or customize appearance.</li>
- *   <li>Callbacks can be chained or replaced to integrate with custom application logic.</li>
- * </ul>
  */
 public class MainMenuView extends JPanel {
 
+	/**
+	 * Callback invoked when Start is chosen from the menu.
+	 */
 	private final Runnable onStart;
+	/**
+	 * Callback invoked when Exit is chosen from the menu.
+	 */
 	private final Runnable onExit;
 
 	/**
@@ -56,13 +43,6 @@ public class MainMenuView extends JPanel {
 		this.onStart = onStart;
 		this.onExit = onExit;
 		initializeComponents();
-	}
-
-	/**
-	 * Default constructor for embedding without external callbacks.
-	 */
-	public MainMenuView() {
-		this(null, null);
 	}
 
 	/**

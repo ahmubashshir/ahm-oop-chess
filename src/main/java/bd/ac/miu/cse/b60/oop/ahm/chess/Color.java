@@ -1,28 +1,32 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 /**
- * Enum representing the {@code Color} of chess pieces.
+ * Represents the color of a chess piece or player.
+ * <p>
+ * This enum defines the two possible colors in chess: white and black.
+ * Each color has a name, a single-character tag, and an integer player ID.
+ * </p>
  */
 public enum Color {
-	/** White color, represented by {@code "W" / 0}. */
+	/** White color, represented by {@code "W"} and player ID {@code 0}. */
 	WHITE("White", 0),
-	/** Black color, represented by {@code "B" / 1}. */
+	/** Black color, represented by {@code "B"} and player ID {@code 1}. */
 	BLACK("Black", 1);
 
-	/** The single-character tag representing the {@code Color}. */
+	/** The single-character tag representing the color ("W" or "B"). */
 	public final String tag;
 
-	/** The color name for the {@code Color}. */
+	/** The full name of the color ("White" or "Black"). */
 	public final String name;
 
-	/** The integer player id for {@code Color}. */
+	/** The integer player ID for this color (0 for white, 1 for black). */
 	public final int id;
 
 	/**
-	 * Constructs a {@code Color} with the specified tag and id.
+	 * Constructs a {@code Color} with the specified name and player ID.
 	 *
-	 * @param name The color name (e.g., "White" or "Black")
-	 * @param id The integer player id (0 for white, 1 for black)
+	 * @param name the color name (e.g., "White" or "Black")
+	 * @param id   the integer player ID (0 for white, 1 for black)
 	 */
 	private Color(String name, int id) {
 		this.name = name;

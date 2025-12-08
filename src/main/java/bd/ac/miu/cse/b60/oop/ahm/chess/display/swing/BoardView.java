@@ -6,7 +6,6 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
-import bd.ac.miu.cse.b60.oop.ahm.chess.display.SwingDisplay;
 import java.awt.*;
 import java.util.Objects;
 import javax.swing.*;
@@ -18,26 +17,29 @@ import javax.swing.border.LineBorder;
  * and a status line, and is designed to be embedded in a larger window or used standalone.
  *
  * <b>Integration:</b>
- * BoardView is typically managed by {@link SwingDisplay}, which coordinates game state and user interaction.
+ * BoardView is typically managed by {@link bd.ac.miu.cse.b60.oop.ahm.chess.display.SwingDisplay}, which coordinates game state and user interaction.
  * Moves are communicated via registered {@link Display.MoveListener}s, and game-end requests are handled
  * through a callback provided at construction.
  *
  * <b>Public API Overview:</b>
  * <ul>
- *   <li>{@code addMoveListener(Display.MoveListener)}: Register listeners for move events.</li>
- *   <li>{@code updateBoard(Game)}: Update the board display from a {@link Game} instance.</li>
- *   <li>{@code updateCapturedPieces(Game)}: Update captured pieces display.</li>
- *   <li>{@code showMessage(String)}, {@code showError(String)}, {@code showPlayerInfo(String, LocalTime)}, {@code showGameEnd(String)}, {@code showCheckWarning()}: Display status and feedback to the user.</li>
+ *   <li>Move events are handled by a {@link Display.MoveListener} provided in the constructor.</li>
+ *   <li>{@link #updateBoard(Game)}: Update the board display from a {@link Game} instance.</li>
+ *   <li>{@link #updateCapturedPieces(Game)}: Update captured pieces display.</li>
+ *   <li>{@link #updatePlayerInfo(String, java.time.LocalTime)}: Update the player info/status display.</li>
  * </ul>
  *
  * <b>Usage Example:</b>
  * <pre>
- *   BoardView boardView = new BoardView(() -> {
- *       // Handle game end request
- *   });
- *   boardView.addMoveListener((src, dst) -> {
- *       // Handle move from src to dst
- *   });
+ *   BoardView boardView = new BoardView(
+ *       (src, dst) -> {
+ *           // Handle move from src to dst
+ *       },
+ *       () -> {
+ *           // Handle game end request
+ *       },
+ *       display
+ *   );
  *   frame.getContentPane().add(boardView, BorderLayout.CENTER);
  * </pre>
  *
@@ -56,18 +58,27 @@ public class BoardView extends JPanel {
 
 	private static final int BOARD_SIZE = 8;
 
+	/** The 8x8 grid of buttons representing the chess board squares. */
 	private final JButton[][] cells = new JButton[BOARD_SIZE][BOARD_SIZE];
+	/** Panel displaying captured white pieces. */
 	private final JPanel whiteCapturedPanel = new JPanel();
+	/** Panel displaying captured black pieces. */
 	private final JPanel blackCapturedPanel = new JPanel();
+	/** Container for bottom UI elements (status, controls). */
 	private final JPanel bottomContainer = new JPanel(new BorderLayout(6, 6));
+	/** Panel for displaying player and game status. */
 	private final JPanel statusPanel = new JPanel(new BorderLayout(6, 6));
+	/** Label showing current player info and time. */
 	private final JLabel playerInfoLabel = new JLabel(
 	    "Player: N/A    Time: 00:00:00"
 	);
 
+	/** Callback to be invoked when the user requests to end the game. */
 	private final Runnable gameEndRequested;
+	/** Listener for move events triggered by user interaction. */
 	private final Display.MoveListener moveListener;
-	private final SwingDisplay display;
+	/** Reference to the parent SwingDisplay for coordination. */
+	private final Display display;
 
 	/**
 	 * Pending selected source coordinate (null when none selected).
@@ -77,11 +88,15 @@ public class BoardView extends JPanel {
 
 	/**
 	 * Constructs the BoardView and builds its internal Swing components.
+	 *
+	 * @param listener  the move event listener to notify when a move is made
+	 * @param callback  the callback to invoke when the user requests to end the game
+	 * @param display   the parent Display coordinating the UI
 	 */
 	public BoardView(
 	    Display.MoveListener listener,
 	    Runnable callback,
-	    SwingDisplay display
+	    Display display
 	) {
 		setLayout(new BorderLayout(8, 8));
 		buildBoardArea();
