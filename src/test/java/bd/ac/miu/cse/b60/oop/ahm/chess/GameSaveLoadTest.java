@@ -126,6 +126,47 @@ public class GameSaveLoadTest {
 	}
 
 	@Test
+	void testFuzzGameLoadWithMalformedData() {
+		Game game = new Game(java.time.LocalTime.of(0, 10));
+		game.initializePiecePositions();
+		byte[][] fuzzCases = {
+			{}, // empty
+			{ 1, 2, 3 }, // too short
+			{ (byte) 255, (byte) 255, (byte) 255, (byte) 255 }, // all 0xFF
+			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // all zeros
+			{ 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }, // alternating
+			{ (byte) 0xDE, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF }, // random pattern
+			{ (byte) 0xCA, (byte) 0xFE, (byte) 0xBA, (byte) 0xBE }, // random pattern
+			{
+				(byte) 0x00,
+				(byte) 0x01,
+				(byte) 0x02,
+				(byte) 0x03,
+				(byte) 0x04,
+				(byte) 0x05,
+				(byte) 0x06,
+				(byte) 0x07,
+			}, // increasing
+		};
+		for (byte[] fuzz : fuzzCases) {
+			SaveData fuzzData = new SaveData(fuzz);
+			Game newGame = new Game(java.time.LocalTime.of(0, 10));
+			newGame.initializePiecePositions();
+			try {
+				newGame.load(fuzzData);
+			} catch (Exception e) {
+				// Acceptable: should not crash JVM, but should throw
+				assertTrue(
+				    e instanceof RuntimeException ||
+				    e instanceof IllegalArgumentException ||
+				    e instanceof IndexOutOfBoundsException,
+				    "Unexpected exception type: " + e.getClass().getName()
+				);
+			}
+		}
+	}
+
+	@Test
 	void testSaveLoadPlayerTimeAndTurns() {
 		Game game = new Game(LocalTime.of(0, 5));
 		game.initializePiecePositions();
