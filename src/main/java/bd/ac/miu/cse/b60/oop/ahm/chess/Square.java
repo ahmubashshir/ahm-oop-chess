@@ -1,13 +1,8 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
-/**
- * Represents a single square on the chessboard.
- * <p>
- * Each square may contain a chess piece or be empty.
- * This class provides methods to set or retrieve the piece on the square.
- * </p>
- */
-public class Square {
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.*;
+
+public class Square implements Saveable, Loadable {
 
 	/** The chess piece currently on this square, or {@code null} if empty. */
 	private Piece piece;
@@ -33,5 +28,52 @@ public class Square {
 	 */
 	public Piece getPiece() {
 		return piece;
+	}
+
+	@Override
+	public SaveData save() {
+		try {
+			java.io.ByteArrayOutputStream baos =
+			    new java.io.ByteArrayOutputStream();
+			if (piece == null) {
+				baos.write(0); // no piece
+			} else {
+				baos.write(1); // has piece
+				byte[] pdata = piece.save().data;
+				baos.write(pdata.length); // length
+				baos.write(pdata); // data
+			}
+			return new SaveData(baos.toByteArray());
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to save square", e);
+		}
+	}
+
+	// Owner must pass Game instance for context
+	public void load(SaveData state, Game game) {
+		try {
+			java.io.ByteArrayInputStream bais =
+			    new java.io.ByteArrayInputStream(state.data);
+			int hasPiece = bais.read();
+			if (hasPiece == 0) {
+				setPiece(null);
+			} else {
+				int plen = bais.read();
+				byte[] pdata = bais.readNBytes(plen);
+				Piece p = Piece.createFromBytes(pdata[0], pdata[1], game);
+				p.setCaptured(pdata[2] == 1);
+				p.load(new SaveData(pdata));
+				setPiece(p);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to load square", e);
+		}
+	}
+
+	@Override
+	public void load(SaveData state) {
+		throw new UnsupportedOperationException(
+		    "Use load(State, Game) instead."
+		);
 	}
 }

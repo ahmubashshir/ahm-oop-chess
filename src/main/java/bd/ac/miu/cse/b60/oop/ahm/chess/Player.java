@@ -12,7 +12,10 @@ import java.util.Vector;
  * Provides methods for timer management and turn counting.
  * </p>
  */
-public class Player {
+public class Player
+	implements
+	bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable,
+	bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable {
 
 	/** Unique identifier for the player. */
 	private int playerID;
@@ -172,6 +175,70 @@ public class Player {
 	 */
 	public void setMaxNumOfTurns(int newMax) {
 		this.maxNumOfTurns = newMax;
+	}
+
+	@Override
+	public bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData save() {
+		// [playerID (1)][numOfTurns (2)][maxNumOfTurns (2)][timeConsumed (4)][capturedCount (1)][captured...]
+		int capCount = capturedPieces.size();
+		byte[] result = new byte[1 + 2 + 2 + 4 + 1 + capCount * 3];
+		int idx = 0;
+		result[idx++] = (byte) playerID;
+		result[idx++] = (byte) ((numOfTurns >> 8) & 0xFF);
+		result[idx++] = (byte) (numOfTurns & 0xFF);
+		result[idx++] = (byte) ((maxNumOfTurns >> 8) & 0xFF);
+		result[idx++] = (byte) (maxNumOfTurns & 0xFF);
+		int seconds = timeConsumed.toSecondOfDay();
+		result[idx++] = (byte) ((seconds >> 24) & 0xFF);
+		result[idx++] = (byte) ((seconds >> 16) & 0xFF);
+		result[idx++] = (byte) ((seconds >> 8) & 0xFF);
+		result[idx++] = (byte) (seconds & 0xFF);
+		result[idx++] = (byte) capCount;
+		for (Piece p : capturedPieces) {
+			byte[] pdata = p.save().data;
+			System.arraycopy(pdata, 0, result, idx, 3);
+			idx += 3;
+		}
+		return new bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData(result);
+	}
+
+	// Owner must pass Game instance for context
+	public void load(
+	    bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state,
+	    bd.ac.miu.cse.b60.oop.ahm.chess.Game game
+	) {
+		byte[] data = state.data;
+		int idx = 0;
+		playerID = data[idx++];
+		numOfTurns = ((data[idx++] & 0xFF) << 8) | (data[idx++] & 0xFF);
+		maxNumOfTurns = ((data[idx++] & 0xFF) << 8) | (data[idx++] & 0xFF);
+		int seconds =
+		    ((data[idx++] & 0xFF) << 24) |
+		    ((data[idx++] & 0xFF) << 16) |
+		    ((data[idx++] & 0xFF) << 8) |
+		    (data[idx++] & 0xFF);
+		timeConsumed = java.time.LocalTime.ofSecondOfDay(seconds);
+		int capCount = data[idx++];
+		capturedPieces.clear();
+		for (int i = 0; i < capCount; i++) {
+			byte typeByte = data[idx++];
+			byte colorByte = data[idx++];
+			byte capturedByte = data[idx++];
+			Piece p = bd.ac.miu.cse.b60.oop.ahm.chess.Piece.createFromBytes(
+			              typeByte,
+			              colorByte,
+			              game
+			          );
+			p.setCaptured(capturedByte == 1);
+			capturedPieces.add(p);
+		}
+	}
+
+	@Override
+	public void load(bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state) {
+		throw new UnsupportedOperationException(
+		    "Use load(State, Game) instead."
+		);
 	}
 
 	/**

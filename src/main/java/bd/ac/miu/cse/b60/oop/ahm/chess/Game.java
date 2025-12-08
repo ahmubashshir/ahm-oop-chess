@@ -1,6 +1,9 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.piece.*;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
 import java.time.LocalTime;
 
 /**
@@ -15,7 +18,7 @@ import java.time.LocalTime;
  * @see Square
  * @see Piece
  */
-public class Game {
+public class Game implements Saveable, Loadable {
 
 	/** Default width of the chess board (number of columns). */
 	public static int DEFAULT_BOARD_WIDTH = 8;
@@ -416,6 +419,67 @@ public class Game {
 	 */
 	public void setNumOfTurns(Player player, int num) {
 		player.setNumOfTurns(getNumOfTurns(player) + num);
+	}
+
+	@Override
+	public SaveData save() {
+		try {
+			java.io.ByteArrayOutputStream baos =
+			    new java.io.ByteArrayOutputStream();
+
+			// Board
+			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
+				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
+					byte[] sq = board[i][j].save().data;
+					baos.write(sq.length); // write length
+					baos.write(sq); // write data
+				}
+			}
+			// Players
+			for (Player player : players) {
+				byte[] pdata = player.save().data;
+				baos.write(pdata.length); // write length
+				baos.write(pdata); // write data
+			}
+			// Current player
+			baos.write(currentPlayer.getPlayerID());
+			return new SaveData(baos.toByteArray());
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to save game state", e);
+		}
+	}
+
+	@Override
+	public void load(SaveData state) {
+		try {
+			java.io.ByteArrayInputStream bais =
+			    new java.io.ByteArrayInputStream(state.data);
+
+			// Board
+			// Re-initialize board squares to ensure authoritative overwrite
+			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
+				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
+					board[i][j] = new Square();
+				}
+			}
+			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
+				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
+					int sqLen = bais.read();
+					byte[] sqData = bais.readNBytes(sqLen);
+					board[i][j].load(new SaveData(sqData), this);
+				}
+			}
+			// Players
+			for (int idx = 0; idx < 2; idx++) {
+				int pLen = bais.read();
+				byte[] pData = bais.readNBytes(pLen);
+				players[idx].load(new SaveData(pData), this);
+			}
+			// Current player
+			setCurrentPlayer(bais.read());
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to load game state", e);
+		}
 	}
 
 	/**
