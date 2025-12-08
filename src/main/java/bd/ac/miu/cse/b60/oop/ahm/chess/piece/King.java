@@ -45,7 +45,7 @@ public class King extends Piece {
 	 * @return The symbol representation of the king
 	 */
 	public String getSymbol() {
-		return isWhite() ? "♔" : "♚";
+		return isWhite() ? "\u2654" : "\u265a";
 	}
 
 	/**
@@ -95,6 +95,7 @@ public class King extends Piece {
 			    (Math.abs(destCol - sourceCol) == 2) &&
 			    (destRow == sourceRow)
 			) {
+				// Castling logic: king moves two squares horizontally, rook must not have moved, path must be clear
 				int rookCol = (destCol > sourceCol) ? board[0].length - 1 : 0;
 				Square rookSquare = board[destRow][rookCol];
 
@@ -104,11 +105,16 @@ public class King extends Piece {
 				) {
 					int colIncrement = (destCol > sourceCol) ? 1 : -1;
 
+					// Check that all squares between king and rook are empty
 					for (
 					    int col = sourceCol + colIncrement;
 					    col != destCol;
 					    col += colIncrement
-					) if (board[destRow][col].getPiece() != null) return false;
+					) {
+						if (
+						    board[destRow][col].getPiece() != null
+						) return false;
+					}
 
 					this.hasMoved = true;
 					return true;

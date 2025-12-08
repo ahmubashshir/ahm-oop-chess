@@ -12,7 +12,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
  */
 public class Rook extends Piece {
 
-	private boolean hasMoved; // Keep track of whether the rook has moved
+	private boolean hasMoved; // Tracks whether the rook has moved (important for castling)
 
 	/**
 	 * Constructs a new rook with the specified color.
@@ -33,11 +33,13 @@ public class Rook extends Piece {
 	 * @return The symbol representation of the rook.
 	 */
 	public String getSymbol() {
-		return isWhite() ? "♖" : "♜";
+		return isWhite() ? "\u2656" : "\u265c";
 	}
 
 	/**
 	 * Checks if a move from the source square to the destination square is a valid move for the rook.
+	 * The rook moves any number of squares horizontally or vertically, but not diagonally.
+	 * The path must be clear of other pieces.
 	 *
 	 * @param sourceRow the row index of the source square.
 	 * @param sourceCol the column index of the source square.
@@ -69,9 +71,9 @@ public class Rook extends Piece {
 				int minCol = Math.min(sourceCol, destCol);
 				int maxCol = Math.max(sourceCol, destCol);
 
+				// Critical: must check every square between source and destination for blocking pieces
 				for (int col = minCol + 1; col < maxCol; col++) {
 					if (board[sourceRow][col].getPiece() != null) {
-						// There is a piece in the horizontal path
 						return false;
 					}
 				}
@@ -82,15 +84,15 @@ public class Rook extends Piece {
 				int minRow = Math.min(sourceRow, destRow);
 				int maxRow = Math.max(sourceRow, destRow);
 
+				// Critical: must check every square between source and destination for blocking pieces
 				for (int row = minRow + 1; row < maxRow; row++) {
 					if (board[row][sourceCol].getPiece() != null) {
-						// There is a piece in the vertical path
 						return false;
 					}
 				}
 			}
 
-			// The path is clear
+			// The path is clear; mark rook as moved (important for castling logic)
 			hasMoved = true;
 			return true;
 		}

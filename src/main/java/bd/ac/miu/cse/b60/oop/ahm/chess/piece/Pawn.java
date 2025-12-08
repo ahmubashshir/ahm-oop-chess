@@ -11,7 +11,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
  */
 public class Pawn extends Piece {
 
-	private boolean hasMoved; // Keep track of whether the pawn has moved
+	private boolean hasMoved; // Tracks whether the pawn has moved (affects two-square advance)
 
 	/**
 	 * Constructs a new Pawn object with the specified color.
@@ -21,7 +21,6 @@ public class Pawn extends Piece {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Color
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game
 	 */
-
 	public Pawn(Color color, Game game) {
 		super("Pawn", color, game);
 		this.hasMoved = false;
@@ -33,13 +32,15 @@ public class Pawn extends Piece {
 	 * @return The symbol representation of the pawn.
 	 */
 	public String getSymbol() {
-		return isWhite() ? "♙" : "♟";
+		return isWhite() ? "\u2659" : "\u265f";
 	}
 
 	/**
 	 * Checks if a move from the source position to the destination position is a valid move for the pawn.
 	 *
 	 * The method considers the current state of the chessboard and the specific rules for pawn movement.
+	 * - Pawns move forward one square, or two squares if they haven't moved yet.
+	 * - Pawns capture diagonally.
 	 *
 	 * @param sourceRow The row index of the source position.
 	 * @param sourceCol The column index of the source position.
@@ -56,12 +57,8 @@ public class Pawn extends Piece {
 		final Square[][] board = this.game.getBoard();
 
 		int direction;
-		// Get direction of pawn reliant on what color
-		if (isWhite()) {
-			direction = 1;
-		} else {
-			direction = -1;
-		}
+		// White pawns move "up" (increasing row), black pawns move "down" (decreasing row)
+		direction = isWhite() ? 1 : -1;
 
 		// Check if the destination is within the bounds of the board
 		boolean isWithinBounds = ((destRow >= 0) &&
@@ -69,19 +66,18 @@ public class Pawn extends Piece {
 		                          (destCol >= 0) &&
 		                          (destCol < board[0].length));
 
-		// Pass only if in bounds
 		if (isWithinBounds) {
 			// Move forward
 			if (
 			    (sourceCol == destCol) &&
 			    (board[destRow][destCol].getPiece() == null)
 			) {
-				// Move one square
+				// Move one square forward
 				if (sourceRow + direction == destRow) {
 					hasMoved = true;
 					return true;
 				}
-				// Move two squares on its first move
+				// Move two squares forward on its first move
 				else if (
 				    (!hasMoved) &&
 				    (sourceRow + 2 * direction == destRow) &&
@@ -96,7 +92,7 @@ public class Pawn extends Piece {
 			    (Math.abs(destCol - sourceCol) == 1) &&
 			    (sourceRow + direction == destRow)
 			) {
-				// Check if there is an opponent's piece to capture
+				// Only allow capture if there is an opponent's piece
 				Piece targetPiece = board[destRow][destCol].getPiece();
 				return (
 				           (targetPiece != null) &&

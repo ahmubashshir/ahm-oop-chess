@@ -35,7 +35,7 @@ public class Queen extends Piece {
 	 * @return The symbol representation of the queen piece.
 	 */
 	public String getSymbol() {
-		return isWhite() ? "♕" : "♛";
+		return isWhite() ? "\u2655" : "\u265b";
 	}
 
 	/**
@@ -57,7 +57,8 @@ public class Queen extends Piece {
 	    int destCol
 	) {
 		final Square[][] board = this.game.getBoard();
-		// Check if the move is either horizontal, vertical, or diagonal
+
+		// Queen moves: horizontal, vertical, or diagonal
 		boolean isHorizontalMove = ((sourceRow == destRow) &&
 		                            (sourceCol != destCol));
 		boolean isVerticalMove = ((sourceRow != destRow) &&
@@ -81,8 +82,8 @@ public class Queen extends Piece {
 				int maxCol = Math.max(sourceCol, destCol);
 
 				for (int col = minCol + 1; col < maxCol; col++) {
-					// Check if piece in path, if so return false
 					if (board[sourceRow][col].getPiece() != null) {
+						// Blocked horizontally
 						return false;
 					}
 				}
@@ -94,8 +95,8 @@ public class Queen extends Piece {
 				int maxRow = Math.max(sourceRow, destRow);
 
 				for (int row = minRow + 1; row < maxRow; row++) {
-					// Check if piece in path, if so return false
 					if (board[row][sourceCol].getPiece() != null) {
+						// Blocked vertically
 						return false;
 					}
 				}
@@ -103,26 +104,21 @@ public class Queen extends Piece {
 
 			// Check for a clear path in the diagonal movement
 			if (isDiagonalMove) {
-				if (
-				    Math.abs(destRow - sourceRow) ==
-				    Math.abs(destCol - sourceCol)
-				) {
-					int rowIncrement = (destRow > sourceRow) ? 1 : -1;
-					int colIncrement = (destCol > sourceCol) ? 1 : -1;
+				// Diagonal movement: must step row and col together
+				int rowIncrement = (destRow > sourceRow) ? 1 : -1;
+				int colIncrement = (destCol > sourceCol) ? 1 : -1;
 
-					int currentRow = sourceRow + rowIncrement;
-					int currentCol = sourceCol + colIncrement;
+				int currentRow = sourceRow + rowIncrement;
+				int currentCol = sourceCol + colIncrement;
 
-					// Corrected loop condition
-					while (currentRow != destRow || currentCol != destCol) {
-						// Check if piece in path, if so return false
-						if (board[currentRow][currentCol].getPiece() != null) {
-							return false;
-						}
-						// Increment loop parameters to continue index
-						currentRow += rowIncrement;
-						currentCol += colIncrement;
+				// Step until reaching destination
+				while (currentRow != destRow || currentCol != destCol) {
+					if (board[currentRow][currentCol].getPiece() != null) {
+						// Blocked diagonally
+						return false;
 					}
+					currentRow += rowIncrement;
+					currentCol += colIncrement;
 				}
 			}
 

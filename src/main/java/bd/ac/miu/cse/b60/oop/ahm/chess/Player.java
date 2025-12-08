@@ -88,6 +88,7 @@ public class Player {
 
 	/**
 	 * Starts the player's timer, incrementing {@code timeConsumed} by one second at regular intervals.
+	 * Critical: Timer logic ensures time tracking and game-ending conditions.
 	 */
 	public void startTimer() {
 		timer = new Timer();

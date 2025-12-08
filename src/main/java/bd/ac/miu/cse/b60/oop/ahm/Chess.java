@@ -15,7 +15,8 @@ import java.time.LocalTime;
  * Handles the main menu, user input, and game loop.
  * All I/O operations are delegated to the Display interface.
  */
-public final class Chess implements Display.StateListener, Display.MoveListener {
+public final class Chess
+	implements Display.StateListener, Display.MoveListener {
 
 	/** Default time limit for each player. */
 	public static final LocalTime timeLimit = LocalTime.parse("05:00");
@@ -30,8 +31,6 @@ public final class Chess implements Display.StateListener, Display.MoveListener 
 	 */
 	public Chess(Display display) {
 		this.display = display;
-
-		// Register event listeners
 		display.addMenuListener(this);
 		display.addMoveListener(this);
 	}
@@ -137,15 +136,14 @@ public final class Chess implements Display.StateListener, Display.MoveListener 
 	 * Start a new chess game
 	 */
 	private void newGame() {
-		// Start game
-		// Start a new game
+		// Game initialization sequence is critical for timer and turn logic.
 		game = new Game(timeLimit);
 		game.initializePiecePositions();
 		game.setMaxNumOfTurns(10);
 
 		Player currentPlayer = game.getCurrentPlayer();
 
-		// Initialize timers
+		// Initialize timers for both players before starting turns.
 		currentPlayer.startTimer();
 		currentPlayer.pauseTimer();
 
@@ -154,23 +152,20 @@ public final class Chess implements Display.StateListener, Display.MoveListener 
 		currentPlayer.startTimer();
 		currentPlayer.pauseTimer();
 		game.switchPlayer();
+
 		updateGameState();
-		// The game loop is now handled by the display implementation
+		// The game loop is now handled by the display implementation.
 	}
 
 	/**
 	 * Update the player information display
 	 */
 	private void updatePlayerDisplay() {
-		// Show current player and time
 		Player currentPlayer = game.getCurrentPlayer();
 		String playerColor = currentPlayer.getPlayerID() == 1
 		                     ? "Black"
 		                     : "White";
-
 		display.showPlayerInfo(playerColor, currentPlayer.getTimeConsumed());
-
-		// Continue timer for current player
 		currentPlayer.continueTimer();
 	}
 
@@ -182,8 +177,6 @@ public final class Chess implements Display.StateListener, Display.MoveListener 
 		if (game == null || isGameOver()) {
 			return;
 		}
-
-		// Display current game state
 		display.updateCapturedPieces(game);
 		display.updateBoard(game);
 		updatePlayerDisplay();
@@ -203,21 +196,18 @@ public final class Chess implements Display.StateListener, Display.MoveListener 
 		                     : "White";
 
 		if (game.isDraw()) {
-			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    "Both players have run out of turns, game ends in a draw"
 			);
 			endGame();
 			return true;
 		} else if (game.isTimeFinished()) {
-			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    playerColor + " loses as they ran out of time."
 			);
 			endGame();
 			return true;
 		} else if (!game.isKingAlive()) {
-			// Screen management is handled by the display implementation
 			display.showGameEnd(
 			    playerColor + " King is dead, they lose the game"
 			);

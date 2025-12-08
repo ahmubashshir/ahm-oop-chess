@@ -31,10 +31,11 @@ public class Coord {
 	 * Constructs a {@code Coord} with the specified column and row.
 	 *
 	 * @param col the column index, must be between {@code 'a'} and {@code 'h'}.
-	 * @param row the row index, must be between {@code '0'} and {@code '7'}.
+	 * @param row the row index, must be between {@code '1'} and {@code '8'}.
 	 * @throws IllegalArgumentException if {@code col} or {@code row} is outside the valid range.
 	 */
 	public Coord(char col, char row) {
+		// Critical: Validate input chars to ensure only valid chessboard coordinates are accepted.
 		if (
 		    !(((col <= 'h' && col >= 'a') || (col <= 'H' && col >= 'A')) &&
 		      (row <= '8' && row >= '1'))

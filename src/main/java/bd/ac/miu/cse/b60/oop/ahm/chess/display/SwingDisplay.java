@@ -68,7 +68,6 @@ public class SwingDisplay implements Display {
 		}
 	}
 
-	// Keep only the flags we actually need at this level.
 	private volatile boolean exitRequested = false;
 
 	public SwingDisplay() {
@@ -90,35 +89,6 @@ public class SwingDisplay implements Display {
 	/**
 	 * Build the main GUI components on the Swing EDT.
 	 */
-	/**
-	 * Updates the message panel to show the last MAX_MESSAGES messages.
-	 */
-	private void updateMessagePanel() {
-		if (messagePanel == null) return;
-		messagePanel.removeAll();
-		Font font = new Font(Font.MONOSPACED, Font.PLAIN, 13);
-		for (Message msg : messages) {
-			JLabel label = new JLabel(msg.text);
-			label.setFont(font);
-			label.setAlignmentX(Component.LEFT_ALIGNMENT);
-			if (msg.type == MessageType.ERROR) label.setForeground(Color.RED);
-			messagePanel.add(label);
-		}
-		messagePanel.revalidate();
-		messagePanel.repaint();
-	}
-
-	/**
-	 * Adds a message to the message list and updates the panel.
-	 */
-	private void addMessage(String text, MessageType type) {
-		if (messages.size() == MAX_MESSAGES) {
-			messages.removeFirst();
-		}
-		messages.add(new Message(text, type));
-		updateMessagePanel();
-	}
-
 	private void buildUI() {
 		frame = new JFrame("OOPChess: Swing UI");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -156,7 +126,34 @@ public class SwingDisplay implements Display {
 		frame.setVisible(true);
 	}
 
-	// User interactions on the board are handled by BoardView.
+	/**
+	 * Updates the message panel to show the last MAX_MESSAGES messages.
+	 */
+	private void updateMessagePanel() {
+		if (messagePanel == null) return;
+		messagePanel.removeAll();
+		Font font = new Font(Font.MONOSPACED, Font.PLAIN, 13);
+		for (Message msg : messages) {
+			JLabel label = new JLabel(msg.text);
+			label.setFont(font);
+			label.setAlignmentX(Component.LEFT_ALIGNMENT);
+			if (msg.type == MessageType.ERROR) label.setForeground(Color.RED);
+			messagePanel.add(label);
+		}
+		messagePanel.revalidate();
+		messagePanel.repaint();
+	}
+
+	/**
+	 * Adds a message to the message list and updates the panel.
+	 */
+	private void addMessage(String text, MessageType type) {
+		if (messages.size() == MAX_MESSAGES) {
+			messages.removeFirst();
+		}
+		messages.add(new Message(text, type));
+		updateMessagePanel();
+	}
 
 	@Override
 	public void updateBoard(final Game game) {
@@ -164,8 +161,6 @@ public class SwingDisplay implements Display {
 			boardView.updateBoard(game);
 		}
 	}
-
-	// Symbol mapping is implemented inside BoardView.
 
 	@Override
 	public void updateCapturedPieces(final Game game) {

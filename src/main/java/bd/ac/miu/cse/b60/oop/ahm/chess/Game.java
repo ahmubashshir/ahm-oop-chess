@@ -15,35 +15,19 @@ import java.time.LocalTime;
  */
 public class Game {
 
-	/**
-	 * Default width of the game board.
-	 */
+	/** Default width of the game board. */
 	public static int DEFAULT_BOARD_WIDTH = 8;
 
-	/**
-	 * Default height of the game board.
-	 */
+	/** Default height of the game board. */
 	public static int DEFAULT_BOARD_HEIGHT = 8;
 
-	/**
-	 * The game board as a 2D array of squares.
-	 *
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
-	 */
+	/** The game board as a 2D array of squares. */
 	private Square[][] board;
 
-	/**
-	 * Array of players in the game.
-	 *
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
-	 */
+	/** Array of players in the game. */
 	private Player[] players;
 
-	/**
-	 * The current player making a move.
-	 *
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Player
-	 */
+	/** The current player making a move. */
 	private Player currentPlayer;
 
 	/**
@@ -53,7 +37,7 @@ public class Game {
 	 * @param kingdst Column of the king's destination square.
 	 * @param rooksrc Column of the rook's source square.
 	 * @param rookdst Column of the rook's destination square.
-	 * @param row	 Row of the castling move.
+	 * @param row     Row of the castling move.
 	 */
 	private void performCastling(
 	    int kingsrc,
@@ -67,11 +51,9 @@ public class Game {
 		Square rookSourceSquare = board[row][rooksrc];
 		Square rookDestSquare = board[row][rookdst];
 
-		// Move the king for castling
 		kingDestSquare.setPiece(kingSourceSquare.getPiece());
 		kingSourceSquare.setPiece(null);
 
-		// Move the rook for castling
 		rookDestSquare.setPiece(rookSourceSquare.getPiece());
 		rookSourceSquare.setPiece(null);
 	}
@@ -85,30 +67,24 @@ public class Game {
 	 */
 	private boolean isPathClear(Coord src, Coord dst) {
 		if (src.row == dst.row) {
-			// Check for a clear path horizontally
 			int minCol = Math.min(src.col, dst.col);
 			int maxCol = Math.max(src.col, dst.col);
 
 			for (int col = minCol + 1; col < maxCol; col++) {
 				if (board[src.row][col].getPiece() != null) {
-					// There is a piece in the horizontal path
 					return false;
 				}
 			}
 		} else if (src.col == dst.col) {
-			// Check for a clear path vertically
 			int minRow = Math.min(src.row, dst.row);
 			int maxRow = Math.max(src.row, dst.row);
 
 			for (int row = minRow + 1; row < maxRow; row++) {
 				if (board[row][src.col].getPiece() != null) {
-					// There is a piece in the vertical path
 					return false;
 				}
 			}
 		}
-
-		// The path is clear
 		return true;
 	}
 
@@ -119,13 +95,11 @@ public class Game {
 	 */
 	public Game(LocalTime timeLimit) {
 		board = new Square[DEFAULT_BOARD_WIDTH][DEFAULT_BOARD_HEIGHT];
-		// Initialize each Square object in the board array
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 			for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
 				board[i][j] = new Square();
 			}
 		}
-		// Initialize players array
 		players = new Player[2];
 		players[0] = new Player(0, timeLimit);
 		players[1] = new Player(1, timeLimit);
@@ -152,7 +126,7 @@ public class Game {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.King
 	 */
 	public void initializePiecePositions() {
-		// Initialize pieces for the white player
+		// Initial setup for white pieces
 		board[0][0].setPiece(new Rook(Color.WHITE, this));
 		board[0][1].setPiece(new Knight(Color.WHITE, this));
 		board[0][2].setPiece(new Bishop(Color.WHITE, this));
@@ -161,12 +135,11 @@ public class Game {
 		board[0][5].setPiece(new Bishop(Color.WHITE, this));
 		board[0][6].setPiece(new Knight(Color.WHITE, this));
 		board[0][7].setPiece(new Rook(Color.WHITE, this));
-
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 			board[1][i].setPiece(new Pawn(Color.WHITE, this));
 		}
 
-		// Initialize pieces for the black player
+		// Initial setup for black pieces
 		board[7][0].setPiece(new Rook(Color.BLACK, this));
 		board[7][1].setPiece(new Knight(Color.BLACK, this));
 		board[7][2].setPiece(new Bishop(Color.BLACK, this));
@@ -175,12 +148,11 @@ public class Game {
 		board[7][5].setPiece(new Bishop(Color.BLACK, this));
 		board[7][6].setPiece(new Knight(Color.BLACK, this));
 		board[7][7].setPiece(new Rook(Color.BLACK, this));
-
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 			board[6][i].setPiece(new Pawn(Color.BLACK, this));
 		}
 
-		// Initialize the rest of the board with empty squares
+		// Fill remaining squares with empty squares
 		for (int i = 2; i < 6; i++) {
 			for (int j = 0; j < DEFAULT_BOARD_WIDTH; j++) {
 				board[i][j] = new Square();
@@ -246,31 +218,30 @@ public class Game {
 
 		if (pieceToMove == null) return MoveStatus.SourceError;
 
-		// Check if player is moving their own piece
+		// Only allow moving own pieces
 		if (
 		    !((currentPlayer.getPlayerID() == 0 && pieceToMove.isWhite()) ||
 		      (currentPlayer.getPlayerID() == 1 && !pieceToMove.isWhite()))
 		) return MoveStatus.PlayerError;
 
-		// Check if the move is valid for the specific piece
+		// Validate move for the piece
 		if (pieceToMove.isValidMove(src, dst)) {
-			// Check if the destination square is empty or has an opponent's piece
+			// Destination must be empty or contain opponent's piece
 			if (
 			    destSquare.getPiece() == null ||
 			    destSquare.getPiece().isWhite() != pieceToMove.isWhite()
 			) {
-				// Capture the opponent’s piece if it exists
+				// Handle capture
 				if (destSquare.getPiece() != null) {
 					destSquare.getPiece().setCaptured(true);
 					currentPlayer.capturePiece(destSquare.getPiece());
 				}
 
-				// Check for castling (king moving two squares horizontally)
+				// Castling logic for king
 				if (
 				    pieceToMove instanceof King &&
 				    Math.abs(dst.col - src.col) == 2
 				) {
-					// Ensure king is in starting position and correct player
 					boolean isWhite = pieceToMove.isWhite();
 					if (
 					    (isWhite &&
@@ -282,7 +253,6 @@ public class Game {
 					     src.col == 4 &&
 					     currentPlayer.getPlayerID() == 1)
 					) {
-						// King:Queen side castling
 						int rookSrcCol = (dst.col - src.col == 2) ? 7 : 0;
 						int rookDstCol = (dst.col - src.col == 2) ? 5 : 3;
 						performCastling(
@@ -297,9 +267,8 @@ public class Game {
 					return MoveStatus.CastleError;
 				}
 
-				// Check for a clear path for non-castling moves
+				// For non-castling moves, ensure path is clear
 				if (isPathClear(src, dst)) {
-					// Move the piece to the destination square
 					destSquare.setPiece(pieceToMove);
 					sourceSquare.setPiece(null);
 					return MoveStatus.Ok;
@@ -322,44 +291,36 @@ public class Game {
 		int currentKingCol = 0;
 		Piece pieceToCheck;
 
-		if (currentPlayer == players[0]) {
-			currentKingColor = true; // Set current king color to white if first player's turn
-		} else {
-			currentKingColor = false; // Set current king color to black if second player's turn
-		}
+		currentKingColor = (currentPlayer == players[0]);
 
+		// Find current player's king position
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[row].length; col++) {
 				if (
 				    board[row][col] != null &&
 				    board[row][col].getPiece() != null
 				) {
-					// Check if block is empty
-					if (board[row][col].getPiece() instanceof King) {
-						// Check if block is king
-						if (
-						    board[row][col].getPiece().isWhite() ==
-						    currentKingColor
-						) {
-							// Check if king is same color as
-							// current player
-							currentKingRow = row;
-							currentKingCol = col;
-						}
+					if (
+					    board[row][col].getPiece() instanceof King &&
+					    board[row][col].getPiece().isWhite() == currentKingColor
+					) {
+						currentKingRow = row;
+						currentKingCol = col;
 					}
 				}
 			}
 		}
+
+		// Check if any opponent piece can attack the king
 		for (int row = 0; row < board.length; row++) {
 			for (int col = 0; col < board[row].length; col++) {
 				if (
 				    board[row][col] != null &&
 				    board[row][col].getPiece() != null
 				) {
-					// Check if block is empty
 					if (
-					    (board[row][col].getPiece().isWhite() !=
-					     board[currentKingRow][currentKingCol].getPiece().isWhite())
+					    board[row][col].getPiece().isWhite() !=
+					    board[currentKingRow][currentKingCol].getPiece().isWhite()
 					) {
 						pieceToCheck = board[row][col].getPiece();
 						if (
@@ -385,23 +346,22 @@ public class Game {
 	 * @return {@code true} if the king is alive, {@code false} otherwise.
 	 */
 	public boolean isKingAlive() {
-		boolean currentKingColor;
-
-		if (currentPlayer == players[0]) currentKingColor = true;
-		// Set current king color to white if first player's turn
-		else currentKingColor = false; // Set current king color to black if second player's turn
-
-		for (int row = 0; row < board.length; row++) for (
-			    int col = 0;
-			    col < board[row].length;
-			    col++
-			) if (
-				    board[row][col] != null && board[row][col].getPiece() != null // Check if block is empty
-				) if (
-					    board[row][col].getPiece() instanceof King // Check if block is king
-					) if (
-						    board[row][col].getPiece().isWhite() == currentKingColor // Check if king is same color as
-						) return true;
+		boolean currentKingColor = (currentPlayer == players[0]);
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board[row].length; col++) {
+				if (
+				    board[row][col] != null &&
+				    board[row][col].getPiece() != null
+				) {
+					if (
+					    board[row][col].getPiece() instanceof King &&
+					    board[row][col].getPiece().isWhite() == currentKingColor
+					) {
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
 
@@ -411,14 +371,10 @@ public class Game {
 	 * @return {@code true} if the game is a draw, {@code false} otherwise.
 	 */
 	public boolean isDraw() {
-		if (
-		    players[0].getNumOfTurns() >= players[0].getMaxNumOfTurns() &&
-		    players[1].getNumOfTurns() >= players[1].getMaxNumOfTurns()
-		) {
-			return true;
-		} else {
-			return false;
-		}
+		return (
+		           players[0].getNumOfTurns() >= players[0].getMaxNumOfTurns() &&
+		           players[1].getNumOfTurns() >= players[1].getMaxNumOfTurns()
+		       );
 	}
 
 	/**
@@ -445,7 +401,7 @@ public class Game {
 	 * Sets the number of turns for a player.
 	 *
 	 * @param player The player whose turns are set.
-	 * @param num	The number of turns toset.
+	 * @param num    The number of turns to set.
 	 */
 	public void setNumOfTurns(Player player, int num) {
 		player.setNumOfTurns(getNumOfTurns(player) + num);
@@ -473,6 +429,8 @@ public class Game {
 	 * Ends the current game by stopping timers for all players.
 	 */
 	public void end() {
-		for (int i = 0; i < players.length; i++) players[i].stopTimer();
+		for (Player player : players) {
+			player.stopTimer();
+		}
 	}
 }

@@ -23,8 +23,7 @@ public enum MoveStatus {
 	CastleError("Invalid castling movement"),
 
 	/** Indicates the destination contains a piece of the same color. */
-	DestError("Can't capture your own piece"),
-	;
+	DestError("Can't capture your own piece");
 
 	/** The descriptive message associated with the move status. */
 	public final String info;

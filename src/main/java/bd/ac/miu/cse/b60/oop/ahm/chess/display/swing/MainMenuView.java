@@ -65,6 +65,10 @@ public class MainMenuView extends JPanel {
 		this(null, null);
 	}
 
+	/**
+	 * Initializes the UI components and layout for the main menu.
+	 * Critical: Ensures buttons are wired to callbacks and layout is user-friendly.
+	 */
 	private void initializeComponents() {
 		setLayout(new BorderLayout(12, 12));
 		setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
@@ -82,6 +86,7 @@ public class MainMenuView extends JPanel {
 		JButton startBtn = new JButton("Start a new game");
 		JButton exitBtn = new JButton("Exit");
 
+		// Critical: Button actions must invoke the correct callbacks for menu logic.
 		startBtn.addActionListener(e -> {
 			if (onStart != null) onStart.run();
 		});

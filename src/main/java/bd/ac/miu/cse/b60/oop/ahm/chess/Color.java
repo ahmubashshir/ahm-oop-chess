@@ -19,9 +19,10 @@ public enum Color {
 	public final int id;
 
 	/**
-	 * Constructs a {@code Color} with the specified tag.
+	 * Constructs a {@code Color} with the specified tag and id.
 	 *
-	 * @param tag The single-character tag for the {@code Color} (e.g., {@code "W"} for {@code WHITE})
+	 * @param name The color name (e.g., "White" or "Black")
+	 * @param id The integer player id (0 for white, 1 for black)
 	 */
 	private Color(String name, int id) {
 		this.name = name;

@@ -2,6 +2,7 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 /**
  * Enum representing the status of a chess move attempt.
+ * This is used to track the current state of the game or menu selection.
  */
 public enum State {
 	/** Indicates nothing was selected. */

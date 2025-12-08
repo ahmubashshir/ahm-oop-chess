@@ -104,6 +104,7 @@ public abstract class Piece {
 
 	/**
 	 * Checks if a move from the source square to the destination square is valid for this piece.
+	 * This overload allows using Coord objects for convenience.
 	 *
 	 * @param src       Source square coordinates.
 	 * @param dst       Destination square coordinates.
@@ -113,6 +114,7 @@ public abstract class Piece {
 	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Square
 	 */
 	public boolean isValidMove(Coord src, Coord dst) {
+		// Delegates to the main isValidMove implementation.
 		return isValidMove(src.row, src.col, dst.row, dst.col);
 	}
 }

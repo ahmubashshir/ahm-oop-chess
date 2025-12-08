@@ -31,13 +31,15 @@ public class Knight extends Piece {
 	 * @return The symbol representation of the knight
 	 */
 	public String getSymbol() {
-		return isWhite() ? "♘" : "♞";
+		return isWhite() ? "\u2658" : "\u265e";
 	}
 
 	/**
 	 * Checks if the proposed move for the knight is valid based on the rules of chess.
 	 * The knight moves in an L-shaped pattern, two squares in one direction and one square
 	 * perpendicular to that direction, or vice versa.
+	 *
+	 * This logic is critical because the knight is the only piece that can "jump" over others.
 	 *
 	 * @param sourceRow  The current row of the knight.
 	 * @param sourceCol  The current column of the knight.
@@ -56,11 +58,11 @@ public class Knight extends Piece {
 		int rowDiff = Math.abs(destRow - sourceRow);
 		int colDiff = Math.abs(destCol - sourceCol);
 
-		// Check if the move is an L-shaped move for a knight
+		// Knight moves in an L-shape: two squares in one direction and one in the other.
 		boolean isLShapedMove =
 		    (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
 
-		// Check if the destination is within the bounds of the board
+		// Ensure destination is within board bounds.
 		boolean isWithinBounds =
 		    destRow >= 0 &&
 		    destRow < board.length &&
