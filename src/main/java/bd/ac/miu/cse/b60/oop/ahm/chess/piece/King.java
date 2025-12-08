@@ -88,7 +88,6 @@ public class King extends Piece {
 
 		if (isWithinBounds) {
 			if (isOneSquareMove) {
-				this.hasMoved = true;
 				return true;
 			} else if (
 			    !hasMoved &&
@@ -115,13 +114,17 @@ public class King extends Piece {
 						    board[destRow][col].getPiece() != null
 						) return false;
 					}
-
-					this.hasMoved = true;
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void moveNotify() {
+		if (hasMoved) return;
+		this.hasMoved = true;
 	}
 
 	/**
@@ -133,16 +136,5 @@ public class King extends Piece {
 	 */
 	public boolean hasMoved() {
 		return hasMoved;
-	}
-
-	/**
-	 * Sets the moved status of the {@code King}.
-	 * Used primarily for game state management and castling eligibility.
-	 *
-	 * @param hasMoved {@code true} if the king has moved, {@code false} otherwise
-	 * @see bd.ac.miu.cse.b60.oop.ahm.chess.Game#move
-	 */
-	public void setMoved(boolean hasMoved) {
-		this.hasMoved = hasMoved;
 	}
 }

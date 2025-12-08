@@ -55,9 +55,11 @@ public class Game {
 
 		kingDestSquare.setPiece(kingSourceSquare.getPiece());
 		kingSourceSquare.setPiece(null);
+		kingDestSquare.getPiece().moveNotify();
 
 		rookDestSquare.setPiece(rookSourceSquare.getPiece());
 		rookSourceSquare.setPiece(null);
+		rookDestSquare.getPiece().moveNotify();
 	}
 
 	/**
@@ -275,6 +277,7 @@ public class Game {
 				if (isPathClear(src, dst)) {
 					destSquare.setPiece(pieceToMove);
 					sourceSquare.setPiece(null);
+					pieceToMove.moveNotify();
 					return MoveStatus.Ok;
 				}
 				return MoveStatus.PathError;

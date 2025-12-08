@@ -74,7 +74,6 @@ public class Pawn extends Piece {
 			) {
 				// Move one square forward
 				if (sourceRow + direction == destRow) {
-					hasMoved = true;
 					return true;
 				}
 				// Move two squares forward on its first move
@@ -83,7 +82,6 @@ public class Pawn extends Piece {
 				    (sourceRow + 2 * direction == destRow) &&
 				    (board[sourceRow + direction][destCol].getPiece() == null)
 				) {
-					hasMoved = true;
 					return true;
 				}
 			}

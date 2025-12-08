@@ -93,7 +93,6 @@ public class Rook extends Piece {
 			}
 
 			// The path is clear; mark rook as moved (important for castling logic)
-			hasMoved = true;
 			return true;
 		}
 
@@ -110,12 +109,9 @@ public class Rook extends Piece {
 		return hasMoved;
 	}
 
-	/**
-	 * Sets the moved status of the rook.
-	 *
-	 * @param hasMoved {@code true} if the rook has moved, {@code false} otherwise.
-	 */
-	public void setMoved(boolean hasMoved) {
-		this.hasMoved = hasMoved;
+	@Override
+	public void moveNotify() {
+		if (hasMoved) return;
+		hasMoved = true;
 	}
 }

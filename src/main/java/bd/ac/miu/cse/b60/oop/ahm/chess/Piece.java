@@ -107,6 +107,8 @@ public abstract class Piece {
 	    int destCol
 	);
 
+	public void moveNotify() {}
+
 	/**
 	 * Determines if a move from the source square to the destination square is valid for this piece,
 	 * using {@link Coord} objects for convenience.
