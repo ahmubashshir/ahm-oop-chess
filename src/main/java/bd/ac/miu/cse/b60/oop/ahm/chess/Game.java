@@ -119,6 +119,10 @@ public class Game {
 		return board;
 	}
 
+	public Piece getPiece(Coord coord) {
+		return board[coord.row][coord.col].getPiece();
+	}
+
 	/**
 	 * Initializes the board with all chess pieces in their standard starting positions.
 	 * Fills empty squares with new {@code Square} instances.
