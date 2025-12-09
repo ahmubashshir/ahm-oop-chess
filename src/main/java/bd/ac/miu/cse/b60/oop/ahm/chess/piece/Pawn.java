@@ -39,6 +39,12 @@ public class Pawn extends Piece {
 		this.hasMoved = true;
 	}
 
+	/**
+	 * Serializes the Pawn's state to a SavedData object.
+	 * Includes base Piece data and the hasMoved flag.
+	 *
+	 * @return a SavedData object representing the Pawn's state
+	 */
 	@Override
 	public SavedData save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
@@ -49,6 +55,12 @@ public class Pawn extends Piece {
 		return SavedData.create(out);
 	}
 
+	/**
+	 * Loads the Pawn's state from the provided SaveData.
+	 * Restores base Piece data and the hasMoved flag.
+	 *
+	 * @param state the SaveData object containing the Pawn's state
+	 */
 	@Override
 	public void load(SaveData state) {
 		super.load(state);

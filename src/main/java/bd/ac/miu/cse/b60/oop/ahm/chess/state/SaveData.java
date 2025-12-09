@@ -9,18 +9,26 @@ import java.util.Arrays;
 public final class SaveData extends Serializer {
 
 	/**
-	 * Constructs a new State with the given byte data.
+	 * Constructs a new SaveData with the given byte data.
 	 *
-	 * @param data the byte array representing the state
+	 * @param bytes the byte array representing the state
 	 */
 	protected SaveData(byte... bytes) {
 		super(bytes);
 	}
 
+	/**
+	 * Returns the raw byte data of the state.
+	 * @return the byte array representing the state
+	 */
 	public byte[] data() {
 		return data;
 	}
 
+	/**
+	 * Converts this SaveData to a {@link SavedData} object.
+	 * @return the corresponding SavedData object
+	 */
 	public final SavedData toSavedData() {
 		return SavedData.create(data);
 	}
@@ -28,8 +36,9 @@ public final class SaveData extends Serializer {
 	/**
 	 * Validates and loads a SaveData object from the given byte array.
 	 *
-	 * @param saveData the byte array to load from
-	 * @return the loaded SaveData object, or null if the checksum is invalid
+	 * @param saved the byte array to load from
+	 * @return the loaded SaveData object
+	 * @throws IllegalArgumentException if the data length or checksum is invalid
 	 */
 	public static final SaveData load(byte... saved)
 	throws IllegalArgumentException {

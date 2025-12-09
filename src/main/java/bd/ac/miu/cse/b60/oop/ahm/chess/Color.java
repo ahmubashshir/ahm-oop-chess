@@ -34,6 +34,11 @@ public enum Color {
 		this.id = id;
 	}
 
+	/**
+	 * Returns the Color corresponding to the given player ID.
+	 * @param id the player ID (0 for white, 1 for black)
+	 * @return the Color for the specified ID
+	 */
 	public static Color fromId(int id) {
 		return id == 0 ? WHITE : BLACK;
 	}

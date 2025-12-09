@@ -122,6 +122,12 @@ public class Rook extends Piece {
 		hasMoved = true;
 	}
 
+	/**
+	 * Serializes the state of this Rook, including its captured status and whether it has moved.
+	 * The output consists of 3 bytes from Piece plus 1 byte for hasMoved.
+	 *
+	 * @return a SavedData object containing the serialized state
+	 */
 	@Override
 	public SavedData save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
@@ -132,6 +138,12 @@ public class Rook extends Piece {
 		return SavedData.create(out);
 	}
 
+	/**
+	 * Loads the state of this Rook from the provided SaveData.
+	 * Restores captured status and whether the rook has moved.
+	 *
+	 * @param state the SaveData containing the serialized state
+	 */
 	@Override
 	public void load(SaveData state) {
 		super.load(state);

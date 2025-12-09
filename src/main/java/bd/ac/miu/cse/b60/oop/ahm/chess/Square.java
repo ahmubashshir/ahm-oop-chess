@@ -22,6 +22,7 @@ public class Square implements Saveable, Loadable {
 
 	/**
 	 * Constructs an empty square with no piece.
+	 * @param game the game context this square belongs to
 	 */
 	public Square(Game game) {
 		this.game = game;
@@ -45,6 +46,13 @@ public class Square implements Saveable, Loadable {
 		return piece;
 	}
 
+	/**
+	 * Serializes the state of this Square, including its piece if present.
+	 * The output includes a flag for piece presence, and if present,
+	 * the serialized piece data.
+	 *
+	 * @return a SavedData object representing the state of this Square
+	 */
 	@Override
 	public SavedData save() {
 		try (BDOutStream bdos = new BDOutStream()) {
@@ -63,10 +71,10 @@ public class Square implements Saveable, Loadable {
 	}
 
 	/**
-	 * Loads the state of this square from the provided SaveData and Game context.
+	 * Loads the state of this Square from the given SaveData.
+	 * If a piece is present in the data, it is reconstructed and loaded.
 	 *
-	 * @param state the SaveData containing the serialized state of the square
-	 * @param game  the Game instance for context (used to instantiate pieces)
+	 * @param state the SaveData representing the serialized Square
 	 */
 	public void load(SaveData state) {
 		try (BDInStream bdis = new BDInStream(state.data())) {

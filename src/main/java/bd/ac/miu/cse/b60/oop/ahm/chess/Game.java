@@ -430,6 +430,12 @@ public class Game implements Saveable, Loadable {
 		player.setNumOfTurns(getNumOfTurns(player) + num);
 	}
 
+	/**
+	 * Serializes the current state of the game, including the board, players, and game metadata.
+	 * Each board square is saved individually, followed by player and game state information.
+	 *
+	 * @return a {@link SavedData} object containing the serialized game state
+	 */
 	@Override
 	public SavedData save() {
 		try (BDOutStream bdos = new BDOutStream()) {
@@ -455,6 +461,12 @@ public class Game implements Saveable, Loadable {
 		}
 	}
 
+	/**
+	 * Loads the game state from the provided {@link SaveData} object.
+	 * Restores the board, players, and game metadata from the serialized data.
+	 *
+	 * @param state the {@link SaveData} containing the serialized game state
+	 */
 	@Override
 	public void load(SaveData state) {
 		try (BDInStream bdis = new BDInStream(state.data())) {

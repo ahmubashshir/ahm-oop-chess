@@ -7,8 +7,10 @@ package bd.ac.miu.cse.b60.oop.ahm.chess.state;
  */
 public interface Saveable {
 	/**
-	 * Save the current state of the game.
-	 * @return a byte array representing the saved state
+	 * Saves the current state of the game or component.
+	 *
+	 * @return a {@link SavedData} object representing the saved state,
+	 *         including checksum and raw byte data.
 	 */
 	SavedData save();
 }

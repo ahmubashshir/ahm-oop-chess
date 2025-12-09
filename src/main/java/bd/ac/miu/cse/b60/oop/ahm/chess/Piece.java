@@ -36,6 +36,12 @@ public abstract class Piece implements Saveable, Loadable {
 	 */
 	protected abstract byte getTypeByte();
 
+	/**
+	 * Serializes the state of this piece into a SavedData object.
+	 * The output includes the piece type, color, and captured status.
+	 *
+	 * @return a SavedData object representing the serialized state of the piece
+	 */
 	@Override
 	public SavedData save() {
 		return SavedData.create(
@@ -47,6 +53,12 @@ public abstract class Piece implements Saveable, Loadable {
 		       );
 	}
 
+	/**
+	 * Loads the state of this piece from the given SaveData object.
+	 * Restores the captured status from the serialized data.
+	 *
+	 * @param state the SaveData object containing the serialized state
+	 */
 	@Override
 	public void load(SaveData state) {
 		byte[] data = state.data();
@@ -54,11 +66,10 @@ public abstract class Piece implements Saveable, Loadable {
 	}
 
 	/**
-	 * Creates a Piece instance from its serialized byte representation.
+	 * Creates a Piece instance from its serialized SaveData representation.
 	 *
-	 * @param typeByte  the type byte representing the piece type
-	 * @param colorByte the color byte (1 for white, 0 for black)
-	 * @param game      the game instance to associate with the piece
+	 * @param state the serialized piece state
+	 * @param game  the game instance to associate with the piece
 	 * @return the deserialized Piece instance
 	 * @throws RuntimeException if instantiation fails
 	 */

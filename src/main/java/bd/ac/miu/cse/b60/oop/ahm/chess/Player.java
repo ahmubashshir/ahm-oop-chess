@@ -52,9 +52,10 @@ public class Player
 	private int maxNumOfTurns = 50;
 
 	/**
-	 * Constructs a Player with the specified ID.
+	 * Constructs a Player with the specified ID and game context.
 	 *
 	 * @param id the unique identifier for the player
+	 * @param game the game context this player belongs to
 	 */
 	public Player(int id, Game game) {
 		playerID = id;
@@ -63,10 +64,11 @@ public class Player
 	}
 
 	/**
-	 * Constructs a Player with the specified ID and time limit.
+	 * Constructs a Player with the specified ID, time limit, and game context.
 	 *
-	 * @param id        the unique identifier for the player
+	 * @param id the unique identifier for the player
 	 * @param timeLimit the time limit for the player's activities
+	 * @param game the game context this player belongs to
 	 */
 	public Player(int id, LocalTime timeLimit, Game game) {
 		playerID = id;
@@ -186,6 +188,12 @@ public class Player
 		this.maxNumOfTurns = newMax;
 	}
 
+	/**
+	 * Serializes the state of this Player, including ID, turn counts, time consumed,
+	 * time limit, and captured pieces.
+	 *
+	 * @return a {@link SavedData} object representing the saved state of the player
+	 */
 	@Override
 	public SavedData save() {
 		try (BDOutStream bdos = new BDOutStream()) {
@@ -222,6 +230,12 @@ public class Player
 	 *
 	 * @param state the {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData} containing the serialized player state
 	 * @param game  the {@link Game} instance for context when reconstructing pieces
+	 */
+	/**
+	 * Loads the state of this Player from the given {@link SaveData}.
+	 * Restores ID, turn counts, time consumed, time limit, and captured pieces.
+	 *
+	 * @param state the serialized state to load from
 	 */
 	public void load(SaveData state) {
 		byte[] data = state.data();

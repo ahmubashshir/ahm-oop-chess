@@ -145,6 +145,12 @@ public class King extends Piece {
 		return hasMoved;
 	}
 
+	/**
+	 * Serializes the King piece state to a SavedData object.
+	 * Includes base Piece data and the hasMoved flag.
+	 *
+	 * @return a SavedData object representing the King state
+	 */
 	@Override
 	public SavedData save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
@@ -155,6 +161,12 @@ public class King extends Piece {
 		return SavedData.create(out);
 	}
 
+	/**
+	 * Loads the King piece state from the given SaveData object.
+	 * Restores base Piece state and the hasMoved flag.
+	 *
+	 * @param state the SaveData object containing serialized King state
+	 */
 	@Override
 	public void load(SaveData state) {
 		super.load(state);

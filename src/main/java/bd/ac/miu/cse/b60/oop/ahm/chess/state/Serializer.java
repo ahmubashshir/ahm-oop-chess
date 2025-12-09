@@ -2,22 +2,33 @@ package bd.ac.miu.cse.b60.oop.ahm.chess.state;
 
 import java.util.zip.CRC32;
 
+/**
+ * Abstract base class for serializing and deserializing chess game state.
+ * Provides utility methods for checksum calculation and byte conversions.
+ */
 abstract class Serializer {
 
 	/** Raw byte data representing the serialized state. */
 	protected final byte[] data;
+	/** Checksum for the serialized state. */
 	protected final byte[] checksum;
 
 	/**
-	 * Constructs a new State with the given byte data.
+	 * Constructs a new Serializer with the given byte data.
 	 *
-	 * @param data the byte array representing the state
+	 * @param bytes the byte array representing the state
 	 */
 	protected Serializer(byte... bytes) {
 		data = bytes;
 		this.checksum = toLEBytes(checkSum(data));
 	}
 
+	/**
+	 * Converts an integer to a little-endian byte array.
+	 *
+	 * @param x the integer to convert
+	 * @return the little-endian byte array
+	 */
 	public static final byte[] toLEBytes(int x) {
 		byte[] bytes = new byte[Integer.BYTES];
 		for (int i = 0; i < Integer.BYTES; i++) {
@@ -27,6 +38,13 @@ abstract class Serializer {
 		return bytes;
 	}
 
+	/**
+	 * Converts a little-endian byte array to an integer.
+	 *
+	 * @param bytes the byte array to convert
+	 * @return the integer value
+	 * @throws IllegalArgumentException if the byte array length is invalid
+	 */
 	public static final int toInt(byte[] bytes) {
 		if (bytes.length != Integer.BYTES) {
 			throw new IllegalArgumentException("Invalid byte array length");
