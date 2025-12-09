@@ -7,6 +7,8 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Player;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -108,12 +110,44 @@ public class BoardView extends JPanel {
 	}
 
 	private void buildBoardArea() {
-		JPanel center = new JPanel(new BorderLayout(6, 6));
+		// Wrapper panel to center the board and enforce square shape
+		JPanel wrapper = new JPanel(new GridBagLayout());
 
-		JPanel boardPanel = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+		// Board panel with dynamic square size
+		JPanel boardPanel = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE)) {
+			@Override
+			public Dimension getPreferredSize() {
+				Container parent = getParent();
+				if (parent != null) {
+					int size = Math.min(parent.getWidth(), parent.getHeight());
+					return new Dimension(size, size);
+				}
+				return super.getPreferredSize();
+			}
+
+			@Override
+			public void doLayout() {
+				super.doLayout();
+				int size = Math.min(getWidth(), getHeight()) / BOARD_SIZE;
+				Dimension btnDim = new Dimension(size, size);
+				int fontSize = (int) (size * 0.60); // 75% of button size
+				Font dynamicFont = new Font(
+				    Font.MONOSPACED,
+				    Font.BOLD,
+				    fontSize
+				);
+				for (int r = 0; r < BOARD_SIZE; r++) {
+					for (int c = 0; c < BOARD_SIZE; c++) {
+						JButton btn = cells[r][c];
+						btn.setPreferredSize(btnDim);
+						btn.setMinimumSize(btnDim);
+						btn.setMaximumSize(btnDim);
+						btn.setFont(dynamicFont);
+					}
+				}
+			}
+		};
 		boardPanel.setBorder(new LineBorder(Color.DARK_GRAY));
-
-		Font cellFont = new Font(Font.MONOSPACED, Font.BOLD, 36);
 
 		for (int r = 0; r < BOARD_SIZE; r++) {
 			for (int c = 0; c < BOARD_SIZE; c++) {
@@ -121,7 +155,6 @@ public class BoardView extends JPanel {
 				final int col = c;
 				JButton btn = new JButton();
 				btn.setFocusable(false);
-				btn.setFont(cellFont);
 				btn.setMargin(new Insets(2, 2, 2, 2));
 				boolean isLight = ((r + c) % 2 == 0);
 				btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
@@ -130,13 +163,16 @@ public class BoardView extends JPanel {
 				btn.setOpaque(true);
 				btn.setBorder(new LineBorder(Color.GRAY));
 				btn.addActionListener(e -> onCellClicked(row, col));
+				btn.setHorizontalAlignment(SwingConstants.CENTER);
+				btn.setVerticalAlignment(SwingConstants.CENTER);
 				cells[r][c] = btn;
 				boardPanel.add(btn);
 			}
 		}
 
-		center.add(boardPanel, BorderLayout.CENTER);
-		add(center, BorderLayout.CENTER);
+		wrapper.add(boardPanel);
+
+		add(wrapper, BorderLayout.CENTER);
 	}
 
 	private void buildSidePanels() {
