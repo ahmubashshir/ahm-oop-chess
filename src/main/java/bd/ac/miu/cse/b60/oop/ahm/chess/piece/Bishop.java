@@ -13,7 +13,7 @@ public class Bishop extends Piece {
 
 	@Override
 	protected byte getTypeByte() {
-		return 3;
+		return Type.BISHOP.tag;
 	}
 
 	/**

@@ -1,6 +1,9 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.*;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Represents a square on the chess board.
@@ -41,19 +44,18 @@ public class Square implements Saveable, Loadable {
 	}
 
 	@Override
-	public SaveData save() {
+	public SavedData save() {
 		try {
-			java.io.ByteArrayOutputStream baos =
-			    new java.io.ByteArrayOutputStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			if (piece == null) {
 				baos.write(0); // no piece
 			} else {
 				baos.write(1); // has piece
-				byte[] pdata = piece.save().data;
+				byte[] pdata = piece.save().bytes();
 				baos.write(pdata.length); // length
 				baos.write(pdata); // data
 			}
-			return new SaveData(baos.toByteArray());
+			return SavedData.create(baos.toByteArray());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save square", e);
 		}
@@ -67,18 +69,14 @@ public class Square implements Saveable, Loadable {
 	 */
 	public void load(SaveData state) {
 		try {
-			java.io.ByteArrayInputStream bais =
-			    new java.io.ByteArrayInputStream(state.data);
+			ByteArrayInputStream bais = new ByteArrayInputStream(state.data());
 			int hasPiece = bais.read();
 			if (hasPiece == 0) {
 				setPiece(null);
 			} else {
 				int plen = bais.read();
-				byte[] pdata = bais.readNBytes(plen);
-				Piece p = Piece.createFromBytes(pdata[0], pdata[1], game);
-				p.setCaptured(pdata[2] == 1);
-				p.load(new SaveData(pdata));
-				setPiece(p);
+				SaveData pdata = SaveData.load(bais.readNBytes(plen));
+				setPiece(Piece.fromSaveData(pdata, game));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load square", e);

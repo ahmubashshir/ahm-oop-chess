@@ -4,6 +4,8 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
 
 /**
  * Represents the {@code King} piece in chess.
@@ -129,7 +131,7 @@ public class King extends Piece {
 
 	@Override
 	protected byte getTypeByte() {
-		return 0;
+		return Type.KING.tag;
 	}
 
 	/**
@@ -141,5 +143,26 @@ public class King extends Piece {
 	 */
 	public boolean hasMoved() {
 		return hasMoved;
+	}
+
+	@Override
+	public SavedData save() {
+		// 3 bytes from Piece + 1 byte for hasMoved
+		byte[] base = super.save().toSaveData().data();
+		byte[] out = new byte[base.length + 1];
+		System.arraycopy(base, 0, out, 0, base.length);
+		out[base.length] = (byte) (hasMoved ? 1 : 0);
+		return SavedData.create(out);
+	}
+
+	@Override
+	public void load(SaveData state) {
+		super.load(state);
+		byte[] data = state.data();
+		if (data.length > 3) {
+			this.hasMoved = (data[3] == 1);
+		} else {
+			this.hasMoved = false;
+		}
 	}
 }

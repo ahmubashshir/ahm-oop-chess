@@ -10,5 +10,5 @@ public interface Saveable {
 	 * Save the current state of the game.
 	 * @return a byte array representing the saved state
 	 */
-	SaveData save();
+	SavedData save();
 }

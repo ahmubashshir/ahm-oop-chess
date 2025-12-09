@@ -1,5 +1,10 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -182,28 +187,29 @@ public class Player
 	}
 
 	@Override
-	public bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData save() {
-		// [playerID (1)][numOfTurns (2)][maxNumOfTurns (2)][timeConsumed (4)][capturedCount (1)][captured...]
-		int capCount = capturedPieces.size();
-		byte[] result = new byte[1 + 2 + 2 + 4 + 1 + capCount * 3];
-		int idx = 0;
-		result[idx++] = (byte) playerID;
-		result[idx++] = (byte) ((numOfTurns >> 8) & 0xFF);
-		result[idx++] = (byte) (numOfTurns & 0xFF);
-		result[idx++] = (byte) ((maxNumOfTurns >> 8) & 0xFF);
-		result[idx++] = (byte) (maxNumOfTurns & 0xFF);
-		int seconds = timeConsumed.toSecondOfDay();
-		result[idx++] = (byte) ((seconds >> 24) & 0xFF);
-		result[idx++] = (byte) ((seconds >> 16) & 0xFF);
-		result[idx++] = (byte) ((seconds >> 8) & 0xFF);
-		result[idx++] = (byte) (seconds & 0xFF);
-		result[idx++] = (byte) capCount;
-		for (Piece p : capturedPieces) {
-			byte[] pdata = p.save().data;
-			System.arraycopy(pdata, 0, result, idx, 3);
-			idx += 3;
+	public SavedData save() {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			baos.write(playerID);
+			baos.write(numOfTurns);
+			baos.write(maxNumOfTurns);
+			baos.write(timeConsumed.toSecondOfDay());
+			baos.write(capturedPieces.size());
+			for (Piece p : capturedPieces) {
+				byte[] pdata = p.save().bytes();
+				baos.write(pdata.length);
+				baos.write(pdata);
+			}
+			return SavedData.create(baos.toByteArray());
+		} catch (IOException e) {
+			throw new RuntimeException(
+			    String.format(
+			        "Failed to save %s player's state",
+			        Color.fromId(playerID).name
+			    ),
+			    e
+			);
 		}
-		return new bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData(result);
 	}
 
 	/**
@@ -216,33 +222,25 @@ public class Player
 	 * @param state the {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData} containing the serialized player state
 	 * @param game  the {@link Game} instance for context when reconstructing pieces
 	 */
-	public void load(
-	    bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state
-	) {
-		byte[] data = state.data;
-		int idx = 0;
-		playerID = data[idx++];
-		numOfTurns = ((data[idx++] & 0xFF) << 8) | (data[idx++] & 0xFF);
-		maxNumOfTurns = ((data[idx++] & 0xFF) << 8) | (data[idx++] & 0xFF);
-		int seconds =
-		    ((data[idx++] & 0xFF) << 24) |
-		    ((data[idx++] & 0xFF) << 16) |
-		    ((data[idx++] & 0xFF) << 8) |
-		    (data[idx++] & 0xFF);
-		timeConsumed = java.time.LocalTime.ofSecondOfDay(seconds);
-		int capCount = data[idx++];
-		capturedPieces.clear();
-		for (int i = 0; i < capCount; i++) {
-			byte typeByte = data[idx++];
-			byte colorByte = data[idx++];
-			byte capturedByte = data[idx++];
-			Piece p = bd.ac.miu.cse.b60.oop.ahm.chess.Piece.createFromBytes(
-			              typeByte,
-			              colorByte,
-			              game
-			          );
-			p.setCaptured(capturedByte == 1);
-			capturedPieces.add(p);
+	public void load(SaveData state) {
+		byte[] data = state.data();
+		try {
+			ByteArrayInputStream bais = new ByteArrayInputStream(data);
+			playerID = bais.read();
+			numOfTurns = bais.read();
+			maxNumOfTurns = bais.read();
+			timeConsumed = LocalTime.ofSecondOfDay(bais.read());
+			int capCount = bais.read();
+			capturedPieces.clear();
+			while (capturedPieces.size() < capCount) {
+				int len = bais.read();
+				byte[] dat = bais.readNBytes(len);
+				SaveData save = SaveData.load(dat);
+				Piece p = Piece.fromSaveData(save, game);
+				capturedPieces.add(p);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to load players state", e);
 		}
 	}
 

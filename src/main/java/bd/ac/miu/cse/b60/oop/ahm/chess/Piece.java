@@ -1,5 +1,12 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
+import bd.ac.miu.cse.b60.oop.ahm.chess.piece.Type;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import java.lang.reflect.Constructor;
+
 /**
  * Abstract base class for all chess pieces.
  * <p>
@@ -16,23 +23,10 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Knight
  * @see bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn
  */
-public abstract class Piece
-	implements
-	bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable,
-	bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable {
+public abstract class Piece implements Saveable, Loadable {
 
 	/** The formatted name of the piece, including its color tag. */
 	private String name;
-
-	// Type mapping: King=0, Queen=1, Rook=2, Bishop=3, Knight=4, Pawn=5
-	private static final Class<?>[] PIECE_TYPES = {
-		bd.ac.miu.cse.b60.oop.ahm.chess.piece.King.class,
-		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Queen.class,
-		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Rook.class,
-		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Bishop.class,
-		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Knight.class,
-		bd.ac.miu.cse.b60.oop.ahm.chess.piece.Pawn.class,
-	};
 
 	/**
 	 * Returns the type byte representing this piece.
@@ -43,18 +37,19 @@ public abstract class Piece
 	protected abstract byte getTypeByte();
 
 	@Override
-	public bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData save() {
-		byte typeByte = getTypeByte();
-		byte colorByte = (isWhite() ? (byte) 1 : (byte) 0);
-		byte capturedByte = (getCaptured() ? (byte) 1 : (byte) 0);
-		return new bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData(
-		           new byte[] { typeByte, colorByte, capturedByte }
+	public SavedData save() {
+		return SavedData.create(
+		           new byte[] {
+		               getTypeByte(),
+		               (byte) color.id,
+		               (byte) (isCaptured ? 1 : 0),
+		           }
 		       );
 	}
 
 	@Override
-	public void load(bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state) {
-		byte[] data = state.data;
+	public void load(SaveData state) {
+		byte[] data = state.data();
 		setCaptured(data[2] == 1);
 	}
 
@@ -67,21 +62,14 @@ public abstract class Piece
 	 * @return the deserialized Piece instance
 	 * @throws RuntimeException if instantiation fails
 	 */
-	public static Piece createFromBytes(
-	    byte typeByte,
-	    byte colorByte,
-	    bd.ac.miu.cse.b60.oop.ahm.chess.Game game
-	) {
+	public static Piece fromSaveData(SaveData state, Game game) {
 		try {
-			Class<?> clazz = PIECE_TYPES[typeByte];
-			java.lang.reflect.Constructor<?> ctor = clazz.getConstructor(
-			        bd.ac.miu.cse.b60.oop.ahm.chess.Color.class,
-			        bd.ac.miu.cse.b60.oop.ahm.chess.Game.class
-			                                        );
-			bd.ac.miu.cse.b60.oop.ahm.chess.Color color = (colorByte == 1)
-			    ? bd.ac.miu.cse.b60.oop.ahm.chess.Color.WHITE
-			    : bd.ac.miu.cse.b60.oop.ahm.chess.Color.BLACK;
-			return (Piece) ctor.newInstance(color, game);
+			byte[] data = state.data();
+			Class<?> type = Type.fromTag(data[0]).type;
+			Constructor<?> ctor = type.getConstructor(Color.class, Game.class);
+			Piece p = (Piece) ctor.newInstance(Color.fromId(data[1]), game);
+			p.load(state);
+			return p;
 		} catch (Exception e) {
 			throw new RuntimeException(
 			    "Failed to instantiate piece from byte",

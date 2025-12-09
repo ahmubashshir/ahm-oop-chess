@@ -4,6 +4,9 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.piece.*;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalTime;
 
 /**
@@ -428,28 +431,27 @@ public class Game implements Saveable, Loadable {
 	}
 
 	@Override
-	public SaveData save() {
+	public SavedData save() {
 		try {
-			java.io.ByteArrayOutputStream baos =
-			    new java.io.ByteArrayOutputStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			// Board
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
-					byte[] sq = board[i][j].save().data;
+					byte[] sq = board[i][j].save().bytes();
 					baos.write(sq.length); // write length
 					baos.write(sq); // write data
 				}
 			}
 			// Players
 			for (Player player : players) {
-				byte[] pdata = player.save().data;
+				byte[] pdata = player.save().bytes();
 				baos.write(pdata.length); // write length
 				baos.write(pdata); // write data
 			}
 			// Current player
 			baos.write(currentPlayer.getPlayerID());
-			return new SaveData(baos.toByteArray());
+			return SavedData.create(baos.toByteArray());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save game state", e);
 		}
@@ -458,8 +460,9 @@ public class Game implements Saveable, Loadable {
 	@Override
 	public void load(SaveData state) {
 		try {
-			java.io.ByteArrayInputStream bais =
-			    new java.io.ByteArrayInputStream(state.data);
+			ByteArrayInputStream bais = new java.io.ByteArrayInputStream(
+			    state.data()
+			);
 
 			// Board
 			// Re-initialize board squares to ensure authoritative overwrite
@@ -470,16 +473,16 @@ public class Game implements Saveable, Loadable {
 			}
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
-					int sqLen = bais.read();
-					byte[] sqData = bais.readNBytes(sqLen);
-					board[i][j].load(new SaveData(sqData));
+					int len = bais.read();
+					byte[] dat = bais.readNBytes(len);
+					board[i][j].load(SaveData.load(dat));
 				}
 			}
 			// Players
 			for (int idx = 0; idx < 2; idx++) {
-				int pLen = bais.read();
-				byte[] pData = bais.readNBytes(pLen);
-				players[idx].load(new SaveData(pData));
+				int len = bais.read();
+				byte[] dat = bais.readNBytes(len);
+				players[idx].load(SaveData.load(dat));
 			}
 			// Current player
 			setCurrentPlayer(bais.read());

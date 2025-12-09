@@ -5,6 +5,7 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
 
 /**
  * The Pawn class represents a pawn chess piece.
@@ -29,7 +30,7 @@ public class Pawn extends Piece {
 
 	@Override
 	protected byte getTypeByte() {
-		return 5;
+		return Type.PAWN.tag;
 	}
 
 	@Override
@@ -39,20 +40,19 @@ public class Pawn extends Piece {
 	}
 
 	@Override
-	public SaveData save() {
+	public SavedData save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
-		byte[] base = super.save().data;
-		byte hasMovedByte = (byte) (hasMoved ? 1 : 0);
+		byte[] base = super.save().toSaveData().data();
 		byte[] out = new byte[base.length + 1];
 		System.arraycopy(base, 0, out, 0, base.length);
-		out[base.length] = hasMovedByte;
-		return new SaveData(out);
+		out[base.length] = (byte) (hasMoved ? 1 : 0);
+		return SavedData.create(out);
 	}
 
 	@Override
 	public void load(SaveData state) {
 		super.load(state);
-		byte[] data = state.data;
+		byte[] data = state.data();
 		if (data.length > 3) {
 			this.hasMoved = (data[3] == 1);
 		} else {

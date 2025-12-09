@@ -27,7 +27,7 @@ public class Knight extends Piece {
 
 	@Override
 	protected byte getTypeByte() {
-		return 4;
+		return Type.KNIGHT.tag;
 	}
 
 	/**
