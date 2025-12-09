@@ -124,7 +124,9 @@ public class BoardView extends JPanel {
 				btn.setFont(cellFont);
 				btn.setMargin(new Insets(2, 2, 2, 2));
 				boolean isLight = ((r + c) % 2 == 0);
+				btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
 				btn.setBackground(isLight ? Color.LIGHT_GRAY : Color.DARK_GRAY);
+				btn.setForeground(isLight ? Color.DARK_GRAY : Color.LIGHT_GRAY);
 				btn.setOpaque(true);
 				btn.setBorder(new LineBorder(Color.GRAY));
 				btn.addActionListener(e -> onCellClicked(row, col));
