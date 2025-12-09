@@ -13,11 +13,14 @@ public class Square implements Saveable, Loadable {
 
 	/** The chess piece currently on this square, or {@code null} if empty. */
 	private Piece piece;
+	private final Game game;
 
 	/**
 	 * Constructs an empty square with no piece.
 	 */
-	public Square() {}
+	public Square(Game game) {
+		this.game = game;
+	}
 
 	/**
 	 * Places a piece on this square.
@@ -62,7 +65,7 @@ public class Square implements Saveable, Loadable {
 	 * @param state the SaveData containing the serialized state of the square
 	 * @param game  the Game instance for context (used to instantiate pieces)
 	 */
-	public void load(SaveData state, Game game) {
+	public void load(SaveData state) {
 		try {
 			java.io.ByteArrayInputStream bais =
 			    new java.io.ByteArrayInputStream(state.data);
@@ -80,12 +83,5 @@ public class Square implements Saveable, Loadable {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load square", e);
 		}
-	}
-
-	@Override
-	public void load(SaveData state) {
-		throw new UnsupportedOperationException(
-		    "Use load(State, Game) instead."
-		);
 	}
 }

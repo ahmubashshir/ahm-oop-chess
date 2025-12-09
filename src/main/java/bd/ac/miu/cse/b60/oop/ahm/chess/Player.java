@@ -17,6 +17,8 @@ public class Player
 	bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable,
 	bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable {
 
+	private Game game;
+
 	/** Unique identifier for the player. */
 	private int playerID;
 
@@ -49,8 +51,9 @@ public class Player
 	 *
 	 * @param id the unique identifier for the player
 	 */
-	public Player(int id) {
+	public Player(int id, Game game) {
 		playerID = id;
+		this.game = game;
 		capturedPieces = new Vector<>();
 	}
 
@@ -60,9 +63,10 @@ public class Player
 	 * @param id        the unique identifier for the player
 	 * @param timeLimit the time limit for the player's activities
 	 */
-	public Player(int id, LocalTime timeLimit) {
+	public Player(int id, LocalTime timeLimit, Game game) {
 		playerID = id;
 		this.timeLimit = timeLimit;
+		this.game = game;
 		capturedPieces = new Vector<>();
 	}
 
@@ -213,8 +217,7 @@ public class Player
 	 * @param game  the {@link Game} instance for context when reconstructing pieces
 	 */
 	public void load(
-	    bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state,
-	    bd.ac.miu.cse.b60.oop.ahm.chess.Game game
+	    bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state
 	) {
 		byte[] data = state.data;
 		int idx = 0;
@@ -241,13 +244,6 @@ public class Player
 			p.setCaptured(capturedByte == 1);
 			capturedPieces.add(p);
 		}
-	}
-
-	@Override
-	public void load(bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData state) {
-		throw new UnsupportedOperationException(
-		    "Use load(State, Game) instead."
-		);
 	}
 
 	/**

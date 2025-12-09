@@ -104,12 +104,12 @@ public class Game implements Saveable, Loadable {
 		board = new Square[DEFAULT_BOARD_WIDTH][DEFAULT_BOARD_HEIGHT];
 		for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 			for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
-				board[i][j] = new Square();
+				board[i][j] = new Square(this);
 			}
 		}
 		players = new Player[2];
-		players[0] = new Player(0, timeLimit);
-		players[1] = new Player(1, timeLimit);
+		players[0] = new Player(0, timeLimit, this);
+		players[1] = new Player(1, timeLimit, this);
 		setCurrentPlayer(0);
 	}
 
@@ -173,7 +173,7 @@ public class Game implements Saveable, Loadable {
 		// Fill remaining squares with empty squares
 		for (int i = 2; i < 6; i++) {
 			for (int j = 0; j < DEFAULT_BOARD_WIDTH; j++) {
-				board[i][j] = new Square();
+				board[i][j] = new Square(this);
 			}
 		}
 	}
@@ -465,21 +465,21 @@ public class Game implements Saveable, Loadable {
 			// Re-initialize board squares to ensure authoritative overwrite
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
-					board[i][j] = new Square();
+					board[i][j] = new Square(this);
 				}
 			}
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
 					int sqLen = bais.read();
 					byte[] sqData = bais.readNBytes(sqLen);
-					board[i][j].load(new SaveData(sqData), this);
+					board[i][j].load(new SaveData(sqData));
 				}
 			}
 			// Players
 			for (int idx = 0; idx < 2; idx++) {
 				int pLen = bais.read();
 				byte[] pData = bais.readNBytes(pLen);
-				players[idx].load(new SaveData(pData), this);
+				players[idx].load(new SaveData(pData));
 			}
 			// Current player
 			setCurrentPlayer(bais.read());

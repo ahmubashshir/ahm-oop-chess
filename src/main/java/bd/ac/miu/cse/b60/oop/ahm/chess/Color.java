@@ -33,4 +33,8 @@ public enum Color {
 		this.tag = String.valueOf(name.charAt(0));
 		this.id = id;
 	}
+
+	public static Color fromId(int id) {
+		return id == 0 ? WHITE : BLACK;
+	}
 }
