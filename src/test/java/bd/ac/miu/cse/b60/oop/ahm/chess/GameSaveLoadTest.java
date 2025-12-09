@@ -4,11 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.time.LocalTime;
-import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -237,41 +233,20 @@ public class GameSaveLoadTest {
 		assertNull(loadedGame.getPiece(new Coord('h', '7')));
 	}
 
-	@FunctionalInterface
-	interface ReflectiveMethod<R> {
-		R call(Object... t);
-	}
-
-	<R> ReflectiveMethod<R> find(Class<?> c, String name, Class<?>... param) {
-		return (Object... t) -> {
-			try {
-				Method m = c.getDeclaredMethod(name, param);
-				m.setAccessible(true);
-				Object result;
-				if (Modifier.isStatic(m.getModifiers())) {
-					result = m.invoke(null, t);
-				} else {
-					result = m.invoke(t[0], Arrays.copyOfRange(t, 1, t.length));
-				}
-				@SuppressWarnings("unchecked")
-				R castedResult = (R) result;
-				return castedResult;
-			} catch (
-				    NoSuchMethodException
-				    | IllegalAccessException
-				    | InvocationTargetException e
-				) {
-				throw new RuntimeException(e);
-			}
-		};
-	}
-
 	@Test
 	void TestLongBytesCast() {
 		final Class<? super SaveData> k = SaveData.class.getSuperclass();
 
-		ReflectiveMethod<byte[]> toBytes = find(k, "toBytes", int.class);
-		ReflectiveMethod<Integer> toInt = find(k, "toInt", byte[].class);
+		Utils.ReflectiveMethod<byte[]> toBytes = Utils.find(
+		        k,
+		        "toLEBytes",
+		        int.class
+		    );
+		Utils.ReflectiveMethod<Integer> toInt = Utils.find(
+		        k,
+		        "toInt",
+		        byte[].class
+		                                        );
 
 		byte[] bytes = { 0x04, 0x03, 0x02, 0x01 };
 		assertArrayEquals(bytes, toBytes.call(0x01020304));
