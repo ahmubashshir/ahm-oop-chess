@@ -1,9 +1,9 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDInStream;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDOutStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Timer;
@@ -188,19 +188,20 @@ public class Player
 
 	@Override
 	public SavedData save() {
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			baos.write(playerID);
-			baos.write(numOfTurns);
-			baos.write(maxNumOfTurns);
-			baos.write(timeConsumed.toSecondOfDay());
-			baos.write(capturedPieces.size());
+		try (BDOutStream bdos = new BDOutStream()) {
+			bdos.writeInt(playerID);
+			bdos.writeInt(numOfTurns);
+			bdos.writeInt(maxNumOfTurns);
+			bdos.writeLong(timeConsumed.toSecondOfDay());
+			bdos.writeBoolean(timeLimit != null);
+			if (timeLimit != null) bdos.writeLong(timeLimit.toSecondOfDay());
+			bdos.writeInt(capturedPieces.size());
 			for (Piece p : capturedPieces) {
 				byte[] pdata = p.save().bytes();
-				baos.write(pdata.length);
-				baos.write(pdata);
+				bdos.writeInt(pdata.length);
+				bdos.write(pdata);
 			}
-			return SavedData.create(baos.toByteArray());
+			return SavedData.create(bdos.collect());
 		} catch (IOException e) {
 			throw new RuntimeException(
 			    String.format(
@@ -224,17 +225,20 @@ public class Player
 	 */
 	public void load(SaveData state) {
 		byte[] data = state.data();
-		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(data);
-			playerID = bais.read();
-			numOfTurns = bais.read();
-			maxNumOfTurns = bais.read();
-			timeConsumed = LocalTime.ofSecondOfDay(bais.read());
-			int capCount = bais.read();
+		try (BDInStream bdis = new BDInStream(data)) {
+			playerID = bdis.readInt();
+			numOfTurns = bdis.readInt();
+			maxNumOfTurns = bdis.readInt();
+			timeConsumed = LocalTime.ofSecondOfDay(bdis.readLong());
+			if (bdis.readBoolean()) timeLimit = LocalTime.ofSecondOfDay(
+				                                        bdis.readLong()
+				                                    );
+			else timeLimit = null;
+			int capCount = bdis.readInt();
 			capturedPieces.clear();
 			while (capturedPieces.size() < capCount) {
-				int len = bais.read();
-				byte[] dat = bais.readNBytes(len);
+				int len = bdis.readInt();
+				byte[] dat = bdis.readNBytes(len);
 				SaveData save = SaveData.load(dat);
 				Piece p = Piece.fromSaveData(save, game);
 				capturedPieces.add(p);

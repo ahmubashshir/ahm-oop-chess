@@ -1,9 +1,11 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.*;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDInStream;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDOutStream;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
 
 /**
  * Represents a square on the chess board.
@@ -45,17 +47,16 @@ public class Square implements Saveable, Loadable {
 
 	@Override
 	public SavedData save() {
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (BDOutStream bdos = new BDOutStream()) {
 			if (piece == null) {
-				baos.write(0); // no piece
+				bdos.writeBoolean(false); // no piece
 			} else {
-				baos.write(1); // has piece
+				bdos.writeBoolean(true); // has piece
 				byte[] pdata = piece.save().bytes();
-				baos.write(pdata.length); // length
-				baos.write(pdata); // data
+				bdos.writeInt(pdata.length); // length
+				bdos.write(pdata); // data
 			}
-			return SavedData.create(baos.toByteArray());
+			return SavedData.create(bdos.collect());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save square", e);
 		}
@@ -68,14 +69,12 @@ public class Square implements Saveable, Loadable {
 	 * @param game  the Game instance for context (used to instantiate pieces)
 	 */
 	public void load(SaveData state) {
-		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(state.data());
-			int hasPiece = bais.read();
-			if (hasPiece == 0) {
+		try (BDInStream bdis = new BDInStream(state.data())) {
+			if (!bdis.readBoolean()) {
 				setPiece(null);
 			} else {
-				int plen = bais.read();
-				SaveData pdata = SaveData.load(bais.readNBytes(plen));
+				int plen = bdis.readInt();
+				SaveData pdata = SaveData.load(bdis.readNBytes(plen));
 				setPiece(Piece.fromSaveData(pdata, game));
 			}
 		} catch (Exception e) {

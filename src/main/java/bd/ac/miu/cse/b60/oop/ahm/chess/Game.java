@@ -1,12 +1,12 @@
 package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.piece.*;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDInStream;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDOutStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.time.LocalTime;
 
 /**
@@ -432,26 +432,24 @@ public class Game implements Saveable, Loadable {
 
 	@Override
 	public SavedData save() {
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
+		try (BDOutStream bdos = new BDOutStream()) {
 			// Board
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
 					byte[] sq = board[i][j].save().bytes();
-					baos.write(sq.length); // write length
-					baos.write(sq); // write data
+					bdos.writeInt(sq.length); // write length
+					bdos.write(sq); // write data
 				}
 			}
 			// Players
 			for (Player player : players) {
 				byte[] pdata = player.save().bytes();
-				baos.write(pdata.length); // write length
-				baos.write(pdata); // write data
+				bdos.writeInt(pdata.length); // write length
+				bdos.write(pdata); // write data
 			}
 			// Current player
-			baos.write(currentPlayer.getPlayerID());
-			return SavedData.create(baos.toByteArray());
+			bdos.writeInt(currentPlayer.getPlayerID());
+			return SavedData.create(bdos.collect());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save game state", e);
 		}
@@ -459,11 +457,7 @@ public class Game implements Saveable, Loadable {
 
 	@Override
 	public void load(SaveData state) {
-		try {
-			ByteArrayInputStream bais = new java.io.ByteArrayInputStream(
-			    state.data()
-			);
-
+		try (BDInStream bdis = new BDInStream(state.data())) {
 			// Board
 			// Re-initialize board squares to ensure authoritative overwrite
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
@@ -473,19 +467,19 @@ public class Game implements Saveable, Loadable {
 			}
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
-					int len = bais.read();
-					byte[] dat = bais.readNBytes(len);
+					int len = bdis.readInt();
+					byte[] dat = bdis.readNBytes(len);
 					board[i][j].load(SaveData.load(dat));
 				}
 			}
 			// Players
 			for (int idx = 0; idx < 2; idx++) {
-				int len = bais.read();
-				byte[] dat = bais.readNBytes(len);
+				int len = bdis.readInt();
+				byte[] dat = bdis.readNBytes(len);
 				players[idx].load(SaveData.load(dat));
 			}
 			// Current player
-			setCurrentPlayer(bais.read());
+			setCurrentPlayer(bdis.readInt());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load game state", e);
 		}
