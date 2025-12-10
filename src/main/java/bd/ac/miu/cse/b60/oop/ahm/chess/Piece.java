@@ -2,9 +2,9 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.piece.Type;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
 import java.lang.reflect.Constructor;
 
 /**
@@ -37,14 +37,14 @@ public abstract class Piece implements Saveable, Loadable {
 	protected abstract byte getTypeByte();
 
 	/**
-	 * Serializes the state of this piece into a SavedData object.
+	 * Serializes the state of this piece into a SaveFrame object.
 	 * The output includes the piece type, color, and captured status.
 	 *
-	 * @return a SavedData object representing the serialized state of the piece
+	 * @return a SaveFrame object representing the serialized state of the piece
 	 */
 	@Override
-	public SavedData save() {
-		return SavedData.create(
+	public SaveFrame save() {
+		return SaveFrame.create(
 		           new byte[] {
 		               getTypeByte(),
 		               (byte) color.id,
@@ -54,26 +54,26 @@ public abstract class Piece implements Saveable, Loadable {
 	}
 
 	/**
-	 * Loads the state of this piece from the given SaveData object.
+	 * Loads the state of this piece from the given SavePayload object.
 	 * Restores the captured status from the serialized data.
 	 *
-	 * @param state the SaveData object containing the serialized state
+	 * @param state the SavePayload object containing the serialized state
 	 */
 	@Override
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		byte[] data = state.data();
 		setCaptured(data[2] == 1);
 	}
 
 	/**
-	 * Creates a Piece instance from its serialized SaveData representation.
+	 * Creates a Piece instance from its serialized SavePayload representation.
 	 *
 	 * @param state the serialized piece state
 	 * @param game  the game instance to associate with the piece
 	 * @return the deserialized Piece instance
 	 * @throws RuntimeException if instantiation fails
 	 */
-	public static Piece fromSaveData(SaveData state, Game game) {
+	public static Piece fromSave(SavePayload state, Game game) {
 		try {
 			byte[] data = state.data();
 			Class<?> type = Type.fromTag(data[0]).type;

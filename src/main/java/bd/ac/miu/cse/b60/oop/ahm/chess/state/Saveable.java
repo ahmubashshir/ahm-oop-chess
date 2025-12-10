@@ -9,8 +9,8 @@ public interface Saveable {
 	/**
 	 * Saves the current state of the game or component.
 	 *
-	 * @return a {@link SavedData} object representing the saved state,
+	 * @return a {@link SaveFrame} object representing the saved state,
 	 *         including checksum and raw byte data.
 	 */
-	SavedData save();
+	SaveFrame save();
 }

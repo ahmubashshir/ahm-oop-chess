@@ -6,14 +6,14 @@ import java.util.Arrays;
  * Represents a serializable state for the chess game.
  * This class is used to store arbitrary byte data representing the state.
  */
-public final class SaveData extends Serializer {
+public final class SavePayload extends Serializer {
 
 	/**
-	 * Constructs a new SaveData with the given byte data.
+	 * Constructs a new SavePayload with the given byte data.
 	 *
 	 * @param bytes the byte array representing the state
 	 */
-	protected SaveData(byte... bytes) {
+	protected SavePayload(byte... bytes) {
 		super(bytes);
 	}
 
@@ -26,21 +26,21 @@ public final class SaveData extends Serializer {
 	}
 
 	/**
-	 * Converts this SaveData to a {@link SavedData} object.
-	 * @return the corresponding SavedData object
+	 * Converts this SavePayload to a {@link SaveFrame} object.
+	 * @return the corresponding SaveFrame object
 	 */
-	public final SavedData toSavedData() {
-		return SavedData.create(data);
+	public final SaveFrame toSaveFrame() {
+		return SaveFrame.create(data);
 	}
 
 	/**
-	 * Validates and loads a SaveData object from the given byte array.
+	 * Validates and loads a SavePayload object from the given byte array.
 	 *
 	 * @param saved the byte array to load from
-	 * @return the loaded SaveData object
+	 * @return the loaded SavePayload object
 	 * @throws IllegalArgumentException if the data length or checksum is invalid
 	 */
-	public static final SaveData load(byte... saved)
+	public static final SavePayload load(byte... saved)
 	throws IllegalArgumentException {
 		if (saved.length < Integer.BYTES) {
 			throw new IllegalArgumentException("Invalid data length");
@@ -49,7 +49,7 @@ public final class SaveData extends Serializer {
 		int checksum = toInt(Arrays.copyOfRange(saved, 0, Integer.BYTES));
 		byte[] data = Arrays.copyOfRange(saved, Integer.BYTES, saved.length);
 		if (checkSum(data) == checksum) {
-			return new SaveData(data);
+			return new SavePayload(data);
 		}
 
 		throw new IllegalArgumentException("Invalid checksum");

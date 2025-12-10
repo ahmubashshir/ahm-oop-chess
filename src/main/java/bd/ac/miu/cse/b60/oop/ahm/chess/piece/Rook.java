@@ -4,8 +4,8 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
 
 /**
  * The {@code Rook} class represents a rook chess piece that extends the {@code Piece} class.
@@ -126,26 +126,26 @@ public class Rook extends Piece {
 	 * Serializes the state of this Rook, including its captured status and whether it has moved.
 	 * The output consists of 3 bytes from Piece plus 1 byte for hasMoved.
 	 *
-	 * @return a SavedData object containing the serialized state
+	 * @return a SaveFrame object containing the serialized state
 	 */
 	@Override
-	public SavedData save() {
+	public SaveFrame save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
-		byte[] base = super.save().toSaveData().data();
+		byte[] base = super.save().toSavePayload().data();
 		byte[] out = new byte[base.length + 1];
 		System.arraycopy(base, 0, out, 0, base.length);
 		out[base.length] = (byte) (hasMoved ? 1 : 0);
-		return SavedData.create(out);
+		return SaveFrame.create(out);
 	}
 
 	/**
-	 * Loads the state of this Rook from the provided SaveData.
+	 * Loads the state of this Rook from the provided SavePayload.
 	 * Restores captured status and whether the rook has moved.
 	 *
-	 * @param state the SaveData containing the serialized state
+	 * @param state the SavePayload containing the serialized state
 	 */
 	@Override
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		super.load(state);
 		byte[] data = state.data();
 		if (data.length > 3) {

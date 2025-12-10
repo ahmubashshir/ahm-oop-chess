@@ -4,8 +4,8 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
 
 /**
  * The Pawn class represents a pawn chess piece.
@@ -40,29 +40,29 @@ public class Pawn extends Piece {
 	}
 
 	/**
-	 * Serializes the Pawn's state to a SavedData object.
+	 * Serializes the Pawn's state to a SaveFrame object.
 	 * Includes base Piece data and the hasMoved flag.
 	 *
-	 * @return a SavedData object representing the Pawn's state
+	 * @return a SaveFrame object representing the Pawn's state
 	 */
 	@Override
-	public SavedData save() {
+	public SaveFrame save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
-		byte[] base = super.save().toSaveData().data();
+		byte[] base = super.save().toSavePayload().data();
 		byte[] out = new byte[base.length + 1];
 		System.arraycopy(base, 0, out, 0, base.length);
 		out[base.length] = (byte) (hasMoved ? 1 : 0);
-		return SavedData.create(out);
+		return SaveFrame.create(out);
 	}
 
 	/**
-	 * Loads the Pawn's state from the provided SaveData.
+	 * Loads the Pawn's state from the provided SavePayload.
 	 * Restores base Piece data and the hasMoved flag.
 	 *
-	 * @param state the SaveData object containing the Pawn's state
+	 * @param state the SavePayload object containing the Pawn's state
 	 */
 	@Override
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		super.load(state);
 		byte[] data = state.data();
 		if (data.length > 3) {

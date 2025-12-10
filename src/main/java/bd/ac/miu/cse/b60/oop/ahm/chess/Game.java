@@ -4,9 +4,9 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.piece.*;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDInStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDOutStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
 import java.time.LocalTime;
 
 /**
@@ -434,10 +434,10 @@ public class Game implements Saveable, Loadable {
 	 * Serializes the current state of the game, including the board, players, and game metadata.
 	 * Each board square is saved individually, followed by player and game state information.
 	 *
-	 * @return a {@link SavedData} object containing the serialized game state
+	 * @return a {@link SaveFrame} object containing the serialized game state
 	 */
 	@Override
-	public SavedData save() {
+	public SaveFrame save() {
 		try (BDOutStream bdos = new BDOutStream()) {
 			// Board
 			for (int i = 0; i < DEFAULT_BOARD_WIDTH; i++) {
@@ -455,20 +455,20 @@ public class Game implements Saveable, Loadable {
 			}
 			// Current player
 			bdos.writeInt(currentPlayer.getPlayerID());
-			return SavedData.create(bdos.collect());
+			return SaveFrame.create(bdos.collect());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save game state", e);
 		}
 	}
 
 	/**
-	 * Loads the game state from the provided {@link SaveData} object.
+	 * Loads the game state from the provided {@link SavePayload} object.
 	 * Restores the board, players, and game metadata from the serialized data.
 	 *
-	 * @param state the {@link SaveData} containing the serialized game state
+	 * @param state the {@link SavePayload} containing the serialized game state
 	 */
 	@Override
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		try (BDInStream bdis = new BDInStream(state.data())) {
 			// Board
 			// Re-initialize board squares to ensure authoritative overwrite
@@ -481,14 +481,14 @@ public class Game implements Saveable, Loadable {
 				for (int j = 0; j < DEFAULT_BOARD_HEIGHT; j++) {
 					int len = bdis.readInt();
 					byte[] dat = bdis.readNBytes(len);
-					board[i][j].load(SaveData.load(dat));
+					board[i][j].load(SavePayload.load(dat));
 				}
 			}
 			// Players
 			for (int idx = 0; idx < 2; idx++) {
 				int len = bdis.readInt();
 				byte[] dat = bdis.readNBytes(len);
-				players[idx].load(SaveData.load(dat));
+				players[idx].load(SavePayload.load(dat));
 			}
 			// Current player
 			setCurrentPlayer(bdis.readInt());

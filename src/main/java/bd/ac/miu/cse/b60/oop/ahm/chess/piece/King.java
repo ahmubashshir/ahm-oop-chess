@@ -4,8 +4,8 @@ import bd.ac.miu.cse.b60.oop.ahm.chess.Color;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Game;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Piece;
 import bd.ac.miu.cse.b60.oop.ahm.chess.Square;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
 
 /**
  * Represents the {@code King} piece in chess.
@@ -146,29 +146,29 @@ public class King extends Piece {
 	}
 
 	/**
-	 * Serializes the King piece state to a SavedData object.
+	 * Serializes the King piece state to a SaveFrame object.
 	 * Includes base Piece data and the hasMoved flag.
 	 *
-	 * @return a SavedData object representing the King state
+	 * @return a SaveFrame object representing the King state
 	 */
 	@Override
-	public SavedData save() {
+	public SaveFrame save() {
 		// 3 bytes from Piece + 1 byte for hasMoved
-		byte[] base = super.save().toSaveData().data();
+		byte[] base = super.save().toSavePayload().data();
 		byte[] out = new byte[base.length + 1];
 		System.arraycopy(base, 0, out, 0, base.length);
 		out[base.length] = (byte) (hasMoved ? 1 : 0);
-		return SavedData.create(out);
+		return SaveFrame.create(out);
 	}
 
 	/**
-	 * Loads the King piece state from the given SaveData object.
+	 * Loads the King piece state from the given SavePayload object.
 	 * Restores base Piece state and the hasMoved flag.
 	 *
-	 * @param state the SaveData object containing serialized King state
+	 * @param state the SavePayload object containing serialized King state
 	 */
 	@Override
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		super.load(state);
 		byte[] data = state.data();
 		if (data.length > 3) {

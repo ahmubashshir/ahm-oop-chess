@@ -2,8 +2,8 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
@@ -34,13 +34,13 @@ public class GameSaveLoadTest {
 		game.switchPlayer();
 
 		// Save the game state
-		SavedData saved = game.save();
+		SaveFrame saved = game.save();
 
 		// Create a new game instance and load the saved state
 		Game loadedGame = new Game(LocalTime.of(0, 10));
 		loadedGame.initializePiecePositions(); // Ensure board is initialized
 		loadedGame.setMaxNumOfTurns(20);
-		loadedGame.load(saved.toSaveData());
+		loadedGame.load(saved.toSavePayload());
 
 		// Check that the board state is restored
 		assertNull(
@@ -107,11 +107,11 @@ public class GameSaveLoadTest {
 		);
 		game.switchPlayer();
 
-		SavedData saved = game.save();
+		SaveFrame saved = game.save();
 		Game loadedGame = new Game(LocalTime.of(0, 10));
 		loadedGame.initializePiecePositions();
 		loadedGame.setMaxNumOfTurns(20);
-		loadedGame.load(saved.toSaveData());
+		loadedGame.load(saved.toSavePayload());
 
 		// d5 should have a white pawn, d7 and e4 should be empty
 		Piece d5 = loadedGame.getPiece(new Coord('d', '5'));
@@ -150,11 +150,11 @@ public class GameSaveLoadTest {
 			}, // increasing
 		};
 		for (byte[] fuzz : fuzzCases) {
-			SavedData fuzzData = SavedData.create(fuzz);
+			SaveFrame fuzzData = SaveFrame.create(fuzz);
 			Game newGame = new Game(java.time.LocalTime.of(0, 10));
 			newGame.initializePiecePositions();
 			try {
-				newGame.load(fuzzData.toSaveData());
+				newGame.load(fuzzData.toSavePayload());
 			} catch (Exception e) {
 				// Acceptable: should not crash JVM, but should throw
 				assertTrue(
@@ -174,11 +174,11 @@ public class GameSaveLoadTest {
 		game.setMaxNumOfTurns(15);
 		game.getPlayer(0).setNumOfTurns(7);
 		game.getPlayer(1).setNumOfTurns(8);
-		SavedData saved = game.save();
+		SaveFrame saved = game.save();
 		Game loadedGame = new Game(LocalTime.of(0, 5));
 		loadedGame.initializePiecePositions();
 		loadedGame.setMaxNumOfTurns(15);
-		loadedGame.load(saved.toSaveData());
+		loadedGame.load(saved.toSavePayload());
 		assertEquals(7, loadedGame.getPlayer(0).getNumOfTurns());
 		assertEquals(8, loadedGame.getPlayer(1).getNumOfTurns());
 		assertEquals(15, loadedGame.getPlayer(0).getMaxNumOfTurns());
@@ -189,9 +189,9 @@ public class GameSaveLoadTest {
 	void testSaveLoadEmptyBoard() {
 		Game game = new Game(LocalTime.of(0, 10));
 		// Do not initialize pieces, board should be empty
-		SavedData saved = game.save();
+		SaveFrame saved = game.save();
 		Game loadedGame = new Game(LocalTime.of(0, 10));
-		loadedGame.load(saved.toSaveData());
+		loadedGame.load(saved.toSavePayload());
 		for (int i = 0; i < Game.DEFAULT_BOARD_WIDTH; i++) {
 			for (int j = 0; j < Game.DEFAULT_BOARD_HEIGHT; j++) {
 				assertNull(
@@ -222,10 +222,10 @@ public class GameSaveLoadTest {
 			assertEquals(MoveStatus.Ok, game.move(blackSrc, blackDst));
 			game.switchPlayer();
 		}
-		SavedData saved = game.save();
+		SaveFrame saved = game.save();
 		Game loadedGame = new Game(LocalTime.of(0, 10));
 		loadedGame.initializePiecePositions();
-		loadedGame.load(saved.toSaveData());
+		loadedGame.load(saved.toSavePayload());
 		// Check pawn advanced to a7 for White and h2 for Black
 		assertNotNull(loadedGame.getPiece(new Coord('a', '7')));
 		assertNull(loadedGame.getPiece(new Coord('a', '2')));
@@ -235,7 +235,7 @@ public class GameSaveLoadTest {
 
 	@Test
 	void TestLongBytesCast() {
-		final Class<? super SaveData> k = SaveData.class.getSuperclass();
+		final Class<? super SavePayload> k = SavePayload.class.getSuperclass();
 
 		Utils.ReflectiveMethod<byte[]> toBytes = Utils.find(
 		        k,

@@ -7,9 +7,9 @@ package bd.ac.miu.cse.b60.oop.ahm.chess.state;
 public interface Loadable {
 	/**
 	 * Loads the state from the given serialized data.
-	 * Implementations should restore the object's state from the provided SaveData.
+	 * Implementations should restore the object's state from the provided SavePayload.
 	 *
 	 * @param state the serialized state to load from
 	 */
-	void load(SaveData state);
+	void load(SavePayload state);
 }

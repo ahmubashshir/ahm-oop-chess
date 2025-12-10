@@ -3,9 +3,9 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDInStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDOutStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Loadable;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.Saveable;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
 
 /**
  * Represents a square on the chess board.
@@ -51,10 +51,10 @@ public class Square implements Saveable, Loadable {
 	 * The output includes a flag for piece presence, and if present,
 	 * the serialized piece data.
 	 *
-	 * @return a SavedData object representing the state of this Square
+	 * @return a SaveFrame object representing the state of this Square
 	 */
 	@Override
-	public SavedData save() {
+	public SaveFrame save() {
 		try (BDOutStream bdos = new BDOutStream()) {
 			if (piece == null) {
 				bdos.writeBoolean(false); // no piece
@@ -64,26 +64,26 @@ public class Square implements Saveable, Loadable {
 				bdos.writeInt(pdata.length); // length
 				bdos.write(pdata); // data
 			}
-			return SavedData.create(bdos.collect());
+			return SaveFrame.create(bdos.collect());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save square", e);
 		}
 	}
 
 	/**
-	 * Loads the state of this Square from the given SaveData.
+	 * Loads the state of this Square from the given SavePayload.
 	 * If a piece is present in the data, it is reconstructed and loaded.
 	 *
-	 * @param state the SaveData representing the serialized Square
+	 * @param state the SavePayload representing the serialized Square
 	 */
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		try (BDInStream bdis = new BDInStream(state.data())) {
 			if (!bdis.readBoolean()) {
 				setPiece(null);
 			} else {
 				int plen = bdis.readInt();
-				SaveData pdata = SaveData.load(bdis.readNBytes(plen));
-				setPiece(Piece.fromSaveData(pdata, game));
+				SavePayload pdata = SavePayload.load(bdis.readNBytes(plen));
+				setPiece(Piece.fromSave(pdata, game));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load square", e);

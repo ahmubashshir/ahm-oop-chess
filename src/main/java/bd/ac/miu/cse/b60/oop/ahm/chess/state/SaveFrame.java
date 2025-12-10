@@ -2,16 +2,16 @@ package bd.ac.miu.cse.b60.oop.ahm.chess.state;
 
 /**
  * Represents a saved state of the chess game, including checksum.
- * Provides methods to retrieve the raw bytes and convert to SaveData.
+ * Provides methods to retrieve the raw bytes and convert to SavePayload.
  */
-public final class SavedData extends Serializer {
+public final class SaveFrame extends Serializer {
 
 	/**
-	 * Constructs a new SavedData with the given byte data.
+	 * Constructs a new SaveFrame with the given byte data.
 	 *
 	 * @param data the byte array representing the state
 	 */
-	protected SavedData(byte... data) {
+	protected SaveFrame(byte... data) {
 		super(data);
 	}
 
@@ -27,19 +27,19 @@ public final class SavedData extends Serializer {
 	}
 
 	/**
-	 * Converts this SavedData to a SaveData object.
-	 * @return the corresponding SaveData object
+	 * Converts this SaveFrame to a SavePayload object.
+	 * @return the corresponding SavePayload object
 	 */
-	public SaveData toSaveData() {
-		return SaveData.load(bytes());
+	public SavePayload toSavePayload() {
+		return SavePayload.load(bytes());
 	}
 
 	/**
-	 * Factory method to create a SavedData instance.
+	 * Factory method to create a SaveFrame instance.
 	 * @param data the byte array representing the state
-	 * @return a new SavedData instance
+	 * @return a new SaveFrame instance
 	 */
-	public static final SavedData create(byte... data) {
-		return new SavedData(data);
+	public static final SaveFrame create(byte... data) {
+		return new SaveFrame(data);
 	}
 }

@@ -2,8 +2,8 @@ package bd.ac.miu.cse.b60.oop.ahm.chess;
 
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDInStream;
 import bd.ac.miu.cse.b60.oop.ahm.chess.state.BDOutStream;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData;
-import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavedData;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload;
+import bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveFrame;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Timer;
@@ -192,10 +192,10 @@ public class Player
 	 * Serializes the state of this Player, including ID, turn counts, time consumed,
 	 * time limit, and captured pieces.
 	 *
-	 * @return a {@link SavedData} object representing the saved state of the player
+	 * @return a {@link SaveFrame} object representing the saved state of the player
 	 */
 	@Override
-	public SavedData save() {
+	public SaveFrame save() {
 		try (BDOutStream bdos = new BDOutStream()) {
 			bdos.writeInt(playerID);
 			bdos.writeInt(numOfTurns);
@@ -209,7 +209,7 @@ public class Player
 				bdos.writeInt(pdata.length);
 				bdos.write(pdata);
 			}
-			return SavedData.create(bdos.collect());
+			return SaveFrame.create(bdos.collect());
 		} catch (IOException e) {
 			throw new RuntimeException(
 			    String.format(
@@ -222,22 +222,22 @@ public class Player
 	}
 
 	/**
-	 * Loads the player's state from the provided {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData} object and game context.
+	 * Loads the player's state from the provided {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload} object and game context.
 	 * <p>
 	 * This method restores the player's ID, turn counts, time consumed, and captured pieces.
 	 * The {@code game} parameter is required to properly instantiate captured pieces.
 	 * </p>
 	 *
-	 * @param state the {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SaveData} containing the serialized player state
+	 * @param state the {@link bd.ac.miu.cse.b60.oop.ahm.chess.state.SavePayload} containing the serialized player state
 	 * @param game  the {@link Game} instance for context when reconstructing pieces
 	 */
 	/**
-	 * Loads the state of this Player from the given {@link SaveData}.
+	 * Loads the state of this Player from the given {@link SavePayload}.
 	 * Restores ID, turn counts, time consumed, time limit, and captured pieces.
 	 *
 	 * @param state the serialized state to load from
 	 */
-	public void load(SaveData state) {
+	public void load(SavePayload state) {
 		byte[] data = state.data();
 		try (BDInStream bdis = new BDInStream(data)) {
 			playerID = bdis.readInt();
@@ -253,8 +253,8 @@ public class Player
 			while (capturedPieces.size() < capCount) {
 				int len = bdis.readInt();
 				byte[] dat = bdis.readNBytes(len);
-				SaveData save = SaveData.load(dat);
-				Piece p = Piece.fromSaveData(save, game);
+				SavePayload save = SavePayload.load(dat);
+				Piece p = Piece.fromSave(save, game);
 				capturedPieces.add(p);
 			}
 		} catch (IOException e) {
